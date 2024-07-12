@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="requirements" nsURI="http://www.fortiss.org/consistency/viewtypes/requirements"
+    nsPrefix="org.fortiss.consistency.viewtypes.requirements">
+  <eClassifiers xsi:type="ecore:EClass" name="RequirementList" eSuperTypes="basics.ecore#//INamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="containedRequirements"
+        upperBound="-1" eType="#//Requirement"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Requirement" eSuperTypes="basics.ecore#//INamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requirementsId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="description" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="rationale" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="author" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="priority" eType="#//Priority"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="status" eType="#//RequirementStatus"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="RequirementStatus">
+    <eLiterals name="UNSET"/>
+    <eLiterals name="UNKNOWN" value="1"/>
+    <eLiterals name="SATISFIED" value="2"/>
+    <eLiterals name="UNSATISFIED" value="3"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Priority">
+    <eLiterals name="UNSET"/>
+    <eLiterals name="LOW" value="1"/>
+    <eLiterals name="MEDIUM" value="2"/>
+    <eLiterals name="HIGH" value="3"/>
+  </eClassifiers>
+</ecore:EPackage>

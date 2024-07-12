@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="model" nsURI="http://www.fortiss.org/consistency/model" nsPrefix="org.fortiss.consistency.model">
+  <eClassifiers xsi:type="ecore:EClass" name="IHasId" abstract="true" interface="true">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Interface for model elements with an ID."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="uuid" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IHasName" abstract="true" interface="true">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Interface for model elements with a name."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IHasComment" abstract="true" interface="true">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Interface for model elements with a comment."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="comment" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="IHasIdAndName" abstract="true" interface="true"
+      eSuperTypes="#//IHasId #//IHasName">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Interface for model elements with an ID and name."/>
+    </eAnnotations>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BasicElementInformation">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element containing basic information about other model elements."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="elementClassString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="elementName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="elementId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourceModel" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sourceTool" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RelationTargetInformation">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element containing information about the target of a relation between model elements."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="basicInformation" eType="#//BasicElementInformation"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="relationType" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="relationComment" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractElementRelation">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing an abstract relation between model elements."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sourceElement" eType="#//RuleElement"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="targetElements" upperBound="-1"
+        eType="#//RuleElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RuleElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing a rule element of a consistency rule."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nameInRule" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="elementClassString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RuleCondition">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing the condition of a consistency rule."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="originalExpression" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="modifiedExpression" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ConsistencyRule" eSuperTypes="#//IHasIdAndName #//IHasComment">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing a consistency rule."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="ruleScope" upperBound="-1"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ruleContext" upperBound="-1"
+        eType="#//AbstractElementRelation" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ruleCondition" eType="#//RuleCondition"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="confidentialityStatus"
+        eType="#//ConfidentialityStatus" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ConsistencyViolation" eSuperTypes="#//IHasName">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing a violation of a consistency rule."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="violationType" eType="#//ConsistencyViolationType"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="violationTypeExplanation"
+        eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="violatedRule" eType="#//ConsistencyRule"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cause" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="usedContextData" eType="#//ContextWrapper"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ConsistencyViolationType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Enumeration of consistency violations types."/>
+    </eAnnotations>
+    <eLiterals name="FOUND_INCONSISTENCY"/>
+    <eLiterals name="EXPERIENCED_EXCEPTION" value="1"/>
+    <eLiterals name="BLOCKED_ACCESS" value="2"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ContextWrapper">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing a context wrapper, which contains all context data for a consistency rule evaluation."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="contextElements" upperBound="-1"
+        eType="#//StringToElementMapEntry" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="StringToElementMapEntry" instanceClassName="java.util.Map$Entry">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing the map entry for a map of strings to EObjects (element identifier to element object)."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="value" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ConfidentialityStatus">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing the confidentiality status of a consistency rule."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ruleClearance" eType="#//Clearance"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="feedbackLevelClearance"
+        eType="#//FeedbackLevelClearance" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FeedbackLevelClearance">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing the clearance definitions for feedback levels of a consistency rule."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inconsistencyWarningClearance"
+        eType="#//Clearance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ruleWarningClearance" eType="#//Clearance"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="causeWarningClearance"
+        eType="#//Clearance" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fullWarningClearance" eType="#//Clearance"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="FeedbackLevel">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Enumeration of feedback levels for consistency rules."/>
+    </eAnnotations>
+    <eLiterals name="INCONSISTENCY_WARNING"/>
+    <eLiterals name="RULE_WARNING" value="1"/>
+    <eLiterals name="CAUSE_WARNING" value="2"/>
+    <eLiterals name="FULL_WARNING" value="3"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Clearance">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing a clearance definition."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="basisForClearance" eType="#//ClearanceBasis"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="exceptionEntries" upperBound="-1"
+        eType="#//ExceptionEntry" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="ClearanceBasis">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Enumeration of a basis for a clearance definition (the starting point)."/>
+    </eAnnotations>
+    <eLiterals name="NONE"/>
+    <eLiterals name="ALL" value="1"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExceptionEntry">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing an entry for an exception (in a clearance definition)."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="exceptionAttributes" upperBound="-1"
+        eType="#//ExceptionAttribute" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ExceptionAttribute">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Model element representing an exception attribute for clearance definition."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="attributeName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="attributeValue" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="matchType" eType="#//MatchType"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="MatchType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Enumeration of match types for clearance evaluations."/>
+    </eAnnotations>
+    <eLiterals name="IDENTICAL"/>
+    <eLiterals name="MINIMUM" value="1"/>
+    <eLiterals name="MAXIMUM" value="2"/>
+  </eClassifiers>
+  <eSubpackages name="views" nsURI="http://www.fortiss.org/consistency/model/views"
+      nsPrefix="org.fortiss.consistency.model.views">
+    <eClassifiers xsi:type="ecore:EClass" name="ConsistencyView" eSuperTypes="#//IHasIdAndName">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a consistency view containing all the data needed for a consistency rule evaluation."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="content" upperBound="-1"
+          eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ConsistencyViewtype" eSuperTypes="#//IHasIdAndName">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a consistency viewtype containing the plan of all the needed data of model elements for a consistency rule evaluation."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="containedClasses" upperBound="-1"
+          eType="#//views/ClassStringToClassFeaturesMapEntry" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ClassFeature">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a feature of a class, e.g., a class attribute."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="owningClassString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureClassString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="isReference" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ClassStringToClassFeaturesMapEntry"
+        instanceClassName="java.util.Map$Entry">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a map entry of a map between strings and class features (class name to its class features)."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="value" upperBound="-1"
+          eType="#//views/ClassFeature" containment="true"/>
+    </eClassifiers>
+  </eSubpackages>
+  <eSubpackages name="communication" nsURI="http://www.fortiss.org/consistency/model/communication"
+      nsPrefix="org.fortiss.consistency.model.communication">
+    <eClassifiers xsi:type="ecore:EClass" name="ToolAdapterRegistrationEntry">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing an entry for a registered tool adapter."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="adapterIdentifier" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="fullAdapterName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="adapterDataServerHostAddress"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="adapterDataServerPort"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="serializedAdapterPublicKey"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Key must be serialized as UTF8 string"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UserToken">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a token of a registered user."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="token" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UserBaseAttributes">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing the basic atributes of a user."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="hierarchy" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="department" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="company" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UserHiddenInformation">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element containing hidden information about a user."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="userName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="userToken" eType="#//communication/UserToken"
+          containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="baseAttributes" eType="#//communication/UserBaseAttributes"
+          containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UserInitialInformation">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element containing initial information about a user."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="userToken" eType="#//communication/UserToken"
+          containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="currentLocation" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UserDetailedInformation" eSuperTypes="#//communication/UserInitialInformation">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element containing full/detailed information about a user."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="hierarchy" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="department" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="company" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="usedTool" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="triggerTime" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="TriggerRequest">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a container for a consistency check trigger request (message)."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="adapterIdentifier" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="user" eType="#//communication/UserInitialInformation"
+          containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="elementsToBeCheckedInfo"
+          upperBound="-1" eType="#//BasicElementInformation" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="TriggerFeedback">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a container for a consistency check trigger feedback (message)."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="evaluatedRulesCounter"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="performedEvaluationsCounter"
+          eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="foundViolations" upperBound="-1"
+          eType="#//ConsistencyViolation" containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ModelDataRequest">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a container for a model data request (message)."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="requestIdentifier" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="targetedAdapter" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="viewtype" eType="#//views/ConsistencyViewtype"
+          containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="neededElementsInfo" upperBound="-1"
+          eType="#//BasicElementInformation" containment="true"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="user" eType="#//communication/UserDetailedInformation"
+          containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ModelDataFeedback">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Model element representing a container for a model data feedback (message)."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="requestFulfillment" eType="#//communication/RequestFulfillment"/>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="providedData" eType="#//views/ConsistencyView"
+          containment="true"/>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="RequestFulfillment">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Enumeration of the levels of request fulfillment."/>
+      </eAnnotations>
+      <eLiterals name="FULLY_PROVIDED" value="2"/>
+      <eLiterals name="PARTIALLY_PROVIDED" value="1"/>
+      <eLiterals name="REJECTED"/>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

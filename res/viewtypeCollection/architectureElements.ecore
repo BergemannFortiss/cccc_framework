@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="architectureElements" nsURI="http://www.fortiss.org/consistency/viewtypes/architectureElements"
+    nsPrefix="org.fortiss.consistency.viewtypes.architectureElements">
+  <eClassifiers xsi:type="ecore:EClass" name="Architecture" eSuperTypes="basics.ecore#//INamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="containedElements" upperBound="-1"
+        eType="#//ArchitectureElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ArchitectureElement" eSuperTypes="basics.ecore#//INamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="containedElements" upperBound="-1"
+        eType="#//ArchitectureElement" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="bidirectionalConnectors"
+        upperBound="-1" eType="#//Connector" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputConnectors" upperBound="-1"
+        eType="#//InputConnector" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputConnectors" upperBound="-1"
+        eType="#//OutputConnector" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Connector" eSuperTypes="basics.ecore#//INamedCommentedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="ecore:EClass types.ecore#//IType"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="defaultValue" eType="ecore:EClass types.ecore#//IValue"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connectedConnectors" upperBound="-1"
+        eType="#//Connector" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="InputConnector" eSuperTypes="#//Connector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connectedOutputConnectors"
+        upperBound="-1" eType="#//OutputConnector" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="OutputConnector" eSuperTypes="#//Connector">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="connectedInputConnectors"
+        upperBound="-1" eType="#//InputConnector" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LogicalArchitecture" eSuperTypes="#//Architecture"/>
+  <eClassifiers xsi:type="ecore:EClass" name="LogicalElement" eSuperTypes="#//ArchitectureElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="behavior" upperBound="-1"
+        eType="#//BehaviorSpecification" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BehaviorSpecification"/>
+  <eClassifiers xsi:type="ecore:EClass" name="StateAutomaton" eSuperTypes="#//BehaviorSpecification"/>
+  <eClassifiers xsi:type="ecore:EClass" name="CodeSegment" eSuperTypes="#//BehaviorSpecification"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TaskArchitecture" eSuperTypes="#//Architecture"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TaskElement" eSuperTypes="#//ArchitectureElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requiredRamMemory" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="RAM size in KB"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requiredFlashMemory" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Flash size in KB"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Platform" eSuperTypes="#//Architecture"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PlatformExecutionElement" eSuperTypes="#//ArchitectureElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="providedRamMemory" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="RAM size in KB"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="providedFlashMemory" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Flash size in KB"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="acquisitionCost" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Flash size in KB"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+</ecore:EPackage>

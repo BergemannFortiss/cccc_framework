@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<communication>
+
+	<consistencyServer>
+		<address>127.0.0.1</address>
+		<port>5000</port>
+		<maxThreads>10</maxThreads>
+	</consistencyServer>
+
+	<timeouts>
+		<connectionTimeout comment="in ms">10000</connectionTimeout>
+		<readTimeout comment="in ms">10000</readTimeout>
+	</timeouts>
+
+	<sslContext>
+		<protocol>TLSv1.3</protocol>
+		<cipherSuite>TLS_AES_128_GCM_SHA256</cipherSuite>
+		<keyStoreType alternatives="JKS">PKCS12</keyStoreType>
+		<keyManagerType alternatives="SunX509">PKIX</keyManagerType>
+	</sslContext>
+	
+	<restEndpoints>
+		<consistencyCheck comment="provided by consistency server to request a consistency check">/checkConsistency</consistencyCheck>
+		<dataRequest comment="provided by adapters to let the consistency server request model data">/requestModelData</dataRequest>
+	</restEndpoints>
+
+</communication>

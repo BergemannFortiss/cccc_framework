@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="types" nsURI="http://www.fortiss.org/consistency/viewtypes/types"
+    nsPrefix="org.fortiss.consistency.viewtypes.types">
+  <eClassifiers xsi:type="ecore:EClass" name="IType" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeBoolean" eSuperTypes="#//IType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeInteger" eSuperTypes="#//IType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeDouble" eSuperTypes="#//IType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeString" eSuperTypes="#//IType"/>
+  <eClassifiers xsi:type="ecore:EClass" name="IValue" abstract="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ValueBoolean" eSuperTypes="#//IValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ValueInteger" eSuperTypes="#//IValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ValueDouble" eSuperTypes="#//IValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDouble"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ValueString" eSuperTypes="#//IValue">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="NoValue" eSuperTypes="#//IValue"/>
+</ecore:EPackage>

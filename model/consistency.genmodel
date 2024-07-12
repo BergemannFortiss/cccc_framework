@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="(c) 2024. GENERATED CODE: Do not edit, see Ecore metamodel instead!"
+    modelDirectory="/org.fortiss.consistency/generated-src" editDirectory="" editorDirectory=""
+    modelPluginID="org.fortiss.consistency" modelName="Consistency" editPluginClass=""
+    editorPluginClass="" testsDirectory="" testSuiteClass="" importerID="org.eclipse.emf.importer.ecore"
+    containmentProxies="true" complianceLevel="8.0" copyrightFields="false" editPluginID="org.fortiss.consistency.edit"
+    editorPluginID="org.fortiss.consistency.edit" testsPluginID="org.fortiss.consistency.edit">
+  <foreignModel>consistency.ecore</foreignModel>
+  <genPackages prefix="Consistency" basePackage="org.fortiss.consistency" resource="XML"
+      disposableProviderFactory="true" ecorePackage="consistency.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="consistency.ecore#//ConsistencyViolationType">
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//ConsistencyViolationType/FOUND_INCONSISTENCY"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//ConsistencyViolationType/EXPERIENCED_EXCEPTION"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//ConsistencyViolationType/BLOCKED_ACCESS"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="consistency.ecore#//FeedbackLevel">
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//FeedbackLevel/INCONSISTENCY_WARNING"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//FeedbackLevel/RULE_WARNING"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//FeedbackLevel/CAUSE_WARNING"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//FeedbackLevel/FULL_WARNING"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="consistency.ecore#//ClearanceBasis">
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//ClearanceBasis/NONE"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//ClearanceBasis/ALL"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="consistency.ecore#//MatchType">
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//MatchType/IDENTICAL"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//MatchType/MINIMUM"/>
+      <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//MatchType/MAXIMUM"/>
+    </genEnums>
+    <genClasses image="false" ecoreClass="consistency.ecore#//IHasId">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//IHasId/uuid"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="consistency.ecore#//IHasName">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//IHasName/name"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="consistency.ecore#//IHasComment">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//IHasComment/comment"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="consistency.ecore#//IHasIdAndName"/>
+    <genClasses image="false" ecoreClass="consistency.ecore#//BasicElementInformation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//BasicElementInformation/elementClassString"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//BasicElementInformation/elementName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//BasicElementInformation/elementId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//BasicElementInformation/sourceModel"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//BasicElementInformation/sourceTool"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//RelationTargetInformation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//RelationTargetInformation/basicInformation"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//RelationTargetInformation/relationType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//RelationTargetInformation/relationComment"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//AbstractElementRelation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//AbstractElementRelation/sourceElement"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//AbstractElementRelation/targetElements"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//RuleElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//RuleElement/nameInRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//RuleElement/elementClassString"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//RuleCondition">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//RuleCondition/originalExpression"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//RuleCondition/modifiedExpression"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//ConsistencyRule">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EAttribute consistency.ecore#//ConsistencyRule/ruleScope"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConsistencyRule/ruleContext"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConsistencyRule/ruleCondition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConsistencyRule/confidentialityStatus"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//ConsistencyViolation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//ConsistencyViolation/violationType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//ConsistencyViolation/violationTypeExplanation"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConsistencyViolation/violatedRule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//ConsistencyViolation/cause"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConsistencyViolation/usedContextData"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//ContextWrapper">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ContextWrapper/contextElements"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//StringToElementMapEntry">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//StringToElementMapEntry/key"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference consistency.ecore#//StringToElementMapEntry/value"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//ConfidentialityStatus">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConfidentialityStatus/ruleClearance"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ConfidentialityStatus/feedbackLevelClearance"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//FeedbackLevelClearance">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//FeedbackLevelClearance/inconsistencyWarningClearance"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//FeedbackLevelClearance/ruleWarningClearance"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//FeedbackLevelClearance/causeWarningClearance"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//FeedbackLevelClearance/fullWarningClearance"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//Clearance">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//Clearance/basisForClearance"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//Clearance/exceptionEntries"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//ExceptionEntry">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//ExceptionEntry/exceptionAttributes"/>
+    </genClasses>
+    <genClasses ecoreClass="consistency.ecore#//ExceptionAttribute">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//ExceptionAttribute/attributeName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//ExceptionAttribute/attributeValue"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//ExceptionAttribute/matchType"/>
+    </genClasses>
+    <nestedGenPackages prefix="Views" basePackage="org.fortiss.consistency.model"
+        resource="XML" disposableProviderFactory="true" ecorePackage="consistency.ecore#//views">
+      <genClasses ecoreClass="consistency.ecore#//views/ConsistencyView">
+        <genFeatures notify="false" createChild="false" propertySortChoices="true"
+            ecoreFeature="ecore:EReference consistency.ecore#//views/ConsistencyView/content"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//views/ConsistencyViewtype">
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//views/ConsistencyViewtype/containedClasses"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//views/ClassFeature">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/owningClassString"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/featureName"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/featureClassString"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/isReference"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//views/ClassStringToClassFeaturesMapEntry">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassStringToClassFeaturesMapEntry/key"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//views/ClassStringToClassFeaturesMapEntry/value"/>
+      </genClasses>
+    </nestedGenPackages>
+    <nestedGenPackages prefix="Communication" basePackage="org.fortiss.consistency.model"
+        resource="XML" disposableProviderFactory="true" ecorePackage="consistency.ecore#//communication">
+      <genEnums typeSafeEnumCompatible="false" ecoreEnum="consistency.ecore#//communication/RequestFulfillment">
+        <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//communication/RequestFulfillment/FULLY_PROVIDED"/>
+        <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//communication/RequestFulfillment/PARTIALLY_PROVIDED"/>
+        <genEnumLiterals ecoreEnumLiteral="consistency.ecore#//communication/RequestFulfillment/REJECTED"/>
+      </genEnums>
+      <genClasses ecoreClass="consistency.ecore#//communication/ToolAdapterRegistrationEntry">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ToolAdapterRegistrationEntry/adapterIdentifier"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ToolAdapterRegistrationEntry/fullAdapterName"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ToolAdapterRegistrationEntry/adapterDataServerHostAddress"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ToolAdapterRegistrationEntry/adapterDataServerPort"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ToolAdapterRegistrationEntry/serializedAdapterPublicKey"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/UserToken">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserToken/token"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/UserBaseAttributes">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserBaseAttributes/role"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserBaseAttributes/hierarchy"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserBaseAttributes/department"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserBaseAttributes/company"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/UserHiddenInformation">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserHiddenInformation/userName"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/UserHiddenInformation/userToken"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/UserHiddenInformation/baseAttributes"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/UserInitialInformation">
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/UserInitialInformation/userToken"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserInitialInformation/currentLocation"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/UserDetailedInformation">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserDetailedInformation/role"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserDetailedInformation/hierarchy"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserDetailedInformation/department"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserDetailedInformation/company"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserDetailedInformation/usedTool"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/UserDetailedInformation/triggerTime"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/TriggerRequest">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/TriggerRequest/adapterIdentifier"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/TriggerRequest/user"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/TriggerRequest/elementsToBeCheckedInfo"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/TriggerFeedback">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/TriggerFeedback/evaluatedRulesCounter"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/TriggerFeedback/performedEvaluationsCounter"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/TriggerFeedback/foundViolations"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/ModelDataRequest">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ModelDataRequest/requestIdentifier"/>
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ModelDataRequest/targetedAdapter"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/ModelDataRequest/viewtype"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/ModelDataRequest/neededElementsInfo"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/ModelDataRequest/user"/>
+      </genClasses>
+      <genClasses ecoreClass="consistency.ecore#//communication/ModelDataFeedback">
+        <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//communication/ModelDataFeedback/requestFulfillment"/>
+        <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference consistency.ecore#//communication/ModelDataFeedback/providedData"/>
+      </genClasses>
+    </nestedGenPackages>
+  </genPackages>
+</genmodel:GenModel>

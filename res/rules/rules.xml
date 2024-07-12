@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules>
+  <comment>
+	This is were consistency rules can be defined to be checked when calling the consistency checker.
+	- A good cheat sheet for OCL rules/operations: https://www-sop.inria.fr/members/Charles.Andre/CAdoc/ESINSA/UMLOCL-memo.pdf
+	- To use inside the condition an element that was specified in the context, you need to use its identifier given in the context and mark it with '#' on the beginning and end.
+  </comment>
+  <rule name="R1" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.Platform</scopeElementClass>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.geometryElements.Geometry</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="mountGeometry">org.fortiss.consistency.viewtypes.geometryElements.Geometry</sourceClass>
+            <targets>
+                <targetClass identifier="executionPlatform">org.fortiss.consistency.viewtypes.architectureElements.Platform</targetClass>
+            </targets>
+        </contextCase>
+        <contextCase>
+            <sourceClass identifier="executionPlatform">org.fortiss.consistency.viewtypes.architectureElements.Platform</sourceClass>
+            <targets>
+                <targetClass identifier="mountGeometry">org.fortiss.consistency.viewtypes.geometryElements.Geometry</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#executionPlatform#.containedElements->select(e | e.oclIsTypeOf(architectureElements::PlatformExecutionElement))->size() &lt;= #mountGeometry#.containedElements->select(e | e.oclIsTypeOf(geometryElements::PlaceholderElement))->size()
+    </condition>
+  </rule>
+  <rule name="R2" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</scopeElementClass>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.geometryElements.Geometry</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="platformGeo">org.fortiss.consistency.viewtypes.geometryElements.Geometry</sourceClass>
+            <targets>
+                <targetClass identifier="dictEntry">org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</targetClass>
+            </targets>
+        </contextCase>
+        <contextCase>
+            <sourceClass identifier="dictEntry">org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</sourceClass>
+            <targets>
+                <targetClass identifier="platformGeo">org.fortiss.consistency.viewtypes.geometryElements.Geometry</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	if #dictEntry#.name = 'PLATFORM_WEIGHT' then
+    		#dictEntry#.oclAsType(dictionary::AbsoluteTermEntry).absoluteTerm.oclAsType(types::ValueDouble).value = #platformGeo#.containedElements->collect(elem : geometryElements::GeometryElement | elem.weight)->sum()
+    	else
+    		-- If it is not this specific dictionary entry, we can ignore the rule.
+    		true
+    	endif
+    </condition>
+  </rule>
+  <rule name="R3" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</scopeElementClass>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.geometryElements.Geometry</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="roverGeo">org.fortiss.consistency.viewtypes.geometryElements.Geometry</sourceClass>
+            <targets>
+                <targetClass identifier="dictEntry">org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</targetClass>
+            </targets>
+        </contextCase>
+        <contextCase>
+            <sourceClass identifier="dictEntry">org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</sourceClass>
+            <targets>
+                <targetClass identifier="roverGeo">org.fortiss.consistency.viewtypes.geometryElements.Geometry</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	if #dictEntry#.name = 'FRONT_LASER_OFFSET' then
+    		#dictEntry#.oclAsType(dictionary::AbsoluteTermEntry).absoluteTerm.oclAsType(types::ValueDouble).value = (#roverGeo#.containedElements->select(geometryElem | geometryElem.name = 'Chassis')->first().origin.x - #roverGeo#.containedElements->select(geometryElem | geometryElem.name = 'FrontLaserSensor')->first().origin.x).abs()
+    	else
+    		-- If it is not this specific dictionary entry, we can ignore the rule.
+    		true
+    	endif
+    </condition>
+  </rule>
+  <rule name="R4" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	if #componentAF3#.name.substring(1, ('Task_'.size())) = 'Task_' then
+    		#componentAF3#.name = 'Task_'.concat(#componentOM#.name)
+    	else
+    		if #componentOM#.name.substring(1, ('Task_'.size())) = 'Task_' then
+    			#componentOM#.name = 'Task_'.concat(#componentAF3#.name)
+    		else
+    			false
+    		endif
+    	endif
+    </condition>
+  </rule>
+  <rule name="R5" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#componentAF3#.inputConnectors->size() = #componentOM#.inputConnectors->size() 
+    	and 
+    	#componentOM#.inputConnectors->collect(port : architectureElements::Connector | port.name)->includesAll(#componentAF3#.inputConnectors->collect(port : architectureElements::Connector | port.name))
+    </condition>
+  </rule>
+  <rule name="R6" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#componentAF3#.outputConnectors->size() = #componentOM#.outputConnectors->size() 
+    	and 
+    	#componentOM#.outputConnectors->collect(port : architectureElements::Connector | port.name)->includesAll(#componentAF3#.outputConnectors->collect(port : architectureElements::Connector | port.name))
+    </condition>
+  </rule>
+  <rule name="R7" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#componentAF3#.inputConnectors->size() = #componentOM#.inputConnectors->size() 
+    	and 
+    	#componentAF3#.inputConnectors->forAll(type.oclType() = #componentOM#.inputConnectors->select(port | port.name = name)->first().type.oclType())
+    </condition>
+  </rule>
+  <rule name="R8" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#componentAF3#.outputConnectors->size() = #componentOM#.outputConnectors->size() 
+    	and 
+    	#componentAF3#.outputConnectors->forAll(type.oclType() = #componentOM#.outputConnectors->select(port | port.name = name)->first().type.oclType())
+    </condition>
+  </rule>
+  <rule name="R9" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#componentAF3#.inputConnectors->size() = #componentOM#.inputConnectors->size() 
+    	and 
+    	#componentAF3#.inputConnectors->forAll(comment = #componentOM#.inputConnectors->select(port | port.name = name)->first().comment)
+    </condition>
+  </rule>
+  <rule name="R10" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="componentAF3">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</sourceClass>
+            <targets>
+                <targetClass identifier="componentOM">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	#componentAF3#.outputConnectors->size() = #componentOM#.outputConnectors->size() 
+    	and 
+    	#componentAF3#.outputConnectors->forAll(comment = #componentOM#.outputConnectors->select(port | port.name = name)->first().comment)
+    </condition>
+  </rule>
+  <rule name="R11" comment="">
+    <scope>
+        <scopeElementClass>org.fortiss.consistency.viewtypes.architectureElements.TaskArchitecture</scopeElementClass>
+    </scope>
+    <context>
+        <contextCase>
+            <sourceClass identifier="taskArch">org.fortiss.consistency.viewtypes.architectureElements.TaskArchitecture</sourceClass>
+            <targets>
+                <targetClass identifier="topComponent">org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</targetClass>
+            </targets>
+        </contextCase>
+    </context>
+    <condition>
+    	-- With closure() you can do recursion on features!
+    	let components : Collection(architectureElements::LogicalElement) = #topComponent#.containedElements->closure(containedElements),
+    		componentNames : Collection(String) = components->asSequence()->iterate(component : architectureElements::LogicalElement; names : Collection(String) = Collection{} | names->including(component.name))
+    	in
+	    -- "Task_" has five chars, which is why the start index should be 6 to ignore it.
+		#taskArch#.containedElements->forAll(task | componentNames->includes(task.name.substring(('Task_'.size() + 1),task.name.size())))
+    </condition>
+  </rule>
+</rules>

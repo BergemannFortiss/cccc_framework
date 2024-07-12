@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<!-- (c) 2024 fortiss GmbH -->
+
+<plugin>
+
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated consistency -->
+      <package
+            uri="http://www.fortiss.org/consistency"
+            class="org.fortiss.consistency.model.ConsistencyPackage"
+            genModel="model/consistency.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated consistency -->
+      <package
+            uri="http://www.fortiss.org/consistency/views"
+            class="org.fortiss.consistency.model.views.ViewsPackage"
+            genModel="model/consistency.genmodel"/>
+   </extension>
+
+
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated architectureElements -->
+      <package
+            uri="http://www.fortiss.org/consistency/viewtypes/architectureElements"
+            class="org.fortiss.consistency.viewtypes.architectureElements.ArchitectureElementsPackage"
+            genModel="res/viewtypeCollection/architectureElements.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated architectureElements -->
+      <parser
+            type="architectureelements"
+            class="org.fortiss.consistency.viewtypes.architectureElements.util.ArchitectureElementsResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated requirements -->
+      <package
+            uri="http://www.fortiss.org/consistency/viewtypes/requirements"
+            class="org.fortiss.consistency.viewtypes.requirements.RequirementsPackage"
+            genModel="res/viewtypeCollection/requirements.genmodel"/>
+   </extension>
+
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated requirements -->
+      <parser
+            type="requirements"
+            class="org.fortiss.consistency.viewtypes.requirements.util.RequirementsResourceFactoryImpl"/>
+   </extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated geometryElements -->
+      <package
+            uri="http://www.fortiss.org/consistency/viewtypes/geometryElements"
+            class="org.fortiss.consistency.viewtypes.geometryElements.GeometryElementsPackage"
+            genModel="res/viewtypeCollection/geometryElements.genmodel"/>
+   </extension>
+
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated geometryElements -->
+      <parser
+            type="geometryelements"
+            class="org.fortiss.consistency.viewtypes.geometryElements.util.GeometryElementsResourceFactoryImpl"/>
+   </extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated architectureElements -->
+      <package
+            uri="http://www.fortiss.org/consistency/viewtypes/basics"
+            class="org.fortiss.consistency.viewtypes.basics.BasicsPackage"
+            genModel="res/viewtypeCollection/architectureElements.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated architectureElements -->
+      <parser
+            type="basics"
+            class="org.fortiss.consistency.viewtypes.basics.util.BasicsResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated architectureElements -->
+      <package
+            uri="http://www.fortiss.org/consistency/viewtypes/types"
+            class="org.fortiss.consistency.viewtypes.types.TypesPackage"
+            genModel="res/viewtypeCollection/architectureElements.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated architectureElements -->
+      <parser
+            type="types"
+            class="org.fortiss.consistency.viewtypes.types.util.TypesResourceFactoryImpl"/>
+   </extension>
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated dictionary -->
+      <package
+            uri="http://www.fortiss.org/consistency/viewtypes/dictionary"
+            class="org.fortiss.consistency.viewtypes.dictionary.DictionaryPackage"
+            genModel="res/viewtypeCollection/dictionary.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated dictionary -->
+      <parser
+            type="dictionary"
+            class="org.fortiss.consistency.viewtypes.dictionary.util.DictionaryResourceFactoryImpl"/>
+   </extension>
+</plugin>

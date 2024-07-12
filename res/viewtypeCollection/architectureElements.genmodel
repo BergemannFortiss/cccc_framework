@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.fortiss.consistency/generatedViewtypes" editDirectory="/org.fortiss.consistency.edit/src"
+    editorDirectory="/org.fortiss.consistency.editor/src" modelPluginID="org.fortiss.consistency"
+    modelName="ArchitectureElements" editPluginClass="org.fortiss.consistency.viewtypes.architectureElements.provider.ArchitectureElementsEditPlugin"
+    editorPluginClass="org.fortiss.consistency.viewtypes.architectureElements.presentation.ArchitectureElementsEditorPlugin"
+    rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" testSuiteClass="org.fortiss.consistency.viewtypes.architectureElements.tests.ArchitectureElementsAllTests"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="5.0" copyrightFields="false"
+    editPluginID="org.fortiss.consistency.edit" editorPluginID="org.fortiss.consistency.editor"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>architectureElements.ecore</foreignModel>
+  <genPackages prefix="ArchitectureElements" basePackage="org.fortiss.consistency.viewtypes"
+      resource="XML" disposableProviderFactory="true" ecorePackage="architectureElements.ecore#/">
+    <genClasses ecoreClass="architectureElements.ecore#//Architecture">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//Architecture/containedElements"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//ArchitectureElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//ArchitectureElement/containedElements"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//ArchitectureElement/bidirectionalConnectors"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//ArchitectureElement/inputConnectors"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//ArchitectureElement/outputConnectors"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//Connector">
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference architectureElements.ecore#//Connector/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EReference architectureElements.ecore#//Connector/defaultValue"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//Connector/connectedConnectors"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//InputConnector">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//InputConnector/connectedOutputConnectors"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//OutputConnector">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference architectureElements.ecore#//OutputConnector/connectedInputConnectors"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//LogicalArchitecture"/>
+    <genClasses ecoreClass="architectureElements.ecore#//LogicalElement">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference architectureElements.ecore#//LogicalElement/behavior"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//BehaviorSpecification"/>
+    <genClasses ecoreClass="architectureElements.ecore#//StateAutomaton"/>
+    <genClasses ecoreClass="architectureElements.ecore#//CodeSegment"/>
+    <genClasses ecoreClass="architectureElements.ecore#//TaskArchitecture"/>
+    <genClasses ecoreClass="architectureElements.ecore#//TaskElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute architectureElements.ecore#//TaskElement/requiredRamMemory"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute architectureElements.ecore#//TaskElement/requiredFlashMemory"/>
+    </genClasses>
+    <genClasses ecoreClass="architectureElements.ecore#//Platform"/>
+    <genClasses ecoreClass="architectureElements.ecore#//PlatformExecutionElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute architectureElements.ecore#//PlatformExecutionElement/providedRamMemory"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute architectureElements.ecore#//PlatformExecutionElement/providedFlashMemory"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute architectureElements.ecore#//PlatformExecutionElement/acquisitionCost"/>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Basics" basePackage="org.fortiss.consistency.viewtypes" resource="XML"
+      disposableProviderFactory="true" ecorePackage="basics.ecore#/">
+    <genClasses image="false" ecoreClass="basics.ecore#//IIdElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute basics.ecore#//IIdElement/id"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="basics.ecore#//INamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute basics.ecore#//INamedElement/name"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="basics.ecore#//INamedCommentedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute basics.ecore#//INamedCommentedElement/comment"/>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Types" basePackage="org.fortiss.consistency.viewtypes" resource="XML"
+      disposableProviderFactory="true" ecorePackage="types.ecore#/">
+    <genClasses image="false" ecoreClass="types.ecore#//IType"/>
+    <genClasses ecoreClass="types.ecore#//TypeBoolean"/>
+    <genClasses ecoreClass="types.ecore#//TypeInteger"/>
+    <genClasses ecoreClass="types.ecore#//TypeDouble"/>
+    <genClasses ecoreClass="types.ecore#//TypeString"/>
+    <genClasses image="false" ecoreClass="types.ecore#//IValue"/>
+    <genClasses ecoreClass="types.ecore#//ValueBoolean">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueBoolean/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//ValueInteger">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueInteger/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//ValueDouble">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueDouble/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//ValueString">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueString/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//NoValue"/>
+  </genPackages>
+</genmodel:GenModel>

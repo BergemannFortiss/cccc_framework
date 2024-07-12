@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<links>
+  	<link type="Affiliation" comment="">
+    	<element id="99" name="MaxCost" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.requirements.Requirement</elementClass>
+    	</element>
+    	<element id="57" name="Rover Platform" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.architectureElements.Platform</elementClass>
+    	</element>
+  	</link>
+  	<link type="Affiliation" comment="">
+    	<element id="204" name="Task Architecture" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.architectureElements.TaskArchitecture</elementClass>
+    	</element>
+    	<element id="4" name="Rover Architecture" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</elementClass>
+    	</element>
+  	</link>
+  	<link type="Equivalence" comment="The component 'lowPassFilter' inside the OpenModelica model 'FilterModels' is semantiqually equivalent to the component 'Front Sensor Filtering' inside the AutoFocus3 model 'ConsistencyTesting' (both are logical elements/components).">
+    	<element id="5" name="lowPassFilter" model="FilterModels" tool="OM">
+        	<elementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</elementClass>
+    	</element>
+    	<element id="233" name="Front Sensor Filtering" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.architectureElements.LogicalElement</elementClass>
+    	</element>
+  	</link>
+  	<link type="Embodiment" comment="The CAD element 'combined_upper_rack' inside the Fusion360 model 'combined_upper_rack' is the 3D geometry of the rack that contains the execution platform, i.e., several Raspberry Pis. It is therefore the physical representation/embodiment of the digital representation of the execution platform inside AF3, called 'Rover Platform'.">
+    	<element id="57" name="Rover Platform" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.architectureElements.Platform</elementClass>
+    	</element>
+    	<element id="892" name="combined_upper_rack" model="combined_upper_rack" tool="Fusion360">
+        	<elementClass>org.fortiss.consistency.viewtypes.geometryElements.Geometry</elementClass>
+    	</element>
+  	</link>
+  	<link type="Embodiment" comment="The CAD element 'combined_upper_rack' inside the Fusion360 model 'combined_upper_rack' is the 3D geometry of the rack that contains the execution platform, i.e., several Raspberry Pis. It is therefore the physical representation/embodiment of the digital representation of the execution platform inside AF3 which a parameter is stored in the dictionary entry 'PLATFORM_WEIGHT'">
+    	<element id="229" name="PLATFORM_WEIGHT" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</elementClass>
+    	</element>
+    	<element id="892" name="combined_upper_rack" model="combined_upper_rack" tool="Fusion360">
+        	<elementClass>org.fortiss.consistency.viewtypes.geometryElements.Geometry</elementClass>
+    	</element>
+  	</link>
+  	<link type="Embodiment" comment="The CAD element 'rover' inside the Fusion360 model 'roverAssembly' is the 3D geometry assembly of the rover. It is therefore the physical representation/embodiment of the digital representation of the rover inside AF3 of which a parameter is stored in the dictionary entry 'FRONT_LASER_OFFSET'">
+    	<element id="231" name="FRONT_LASER_OFFSET" model="ConsistencyTesting" tool="AF3">
+        	<elementClass>org.fortiss.consistency.viewtypes.dictionary.DictionaryElement</elementClass>
+    	</element>
+    	<element id="32" name="rover" model="roverAssembly" tool="Fusion360">
+        	<elementClass>org.fortiss.consistency.viewtypes.geometryElements.Geometry</elementClass>
+    	</element>
+  	</link>
+</links>

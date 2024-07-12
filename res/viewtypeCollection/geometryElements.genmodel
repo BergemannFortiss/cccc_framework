@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.fortiss.consistency/generatedViewtypes" editDirectory="/org.fortiss.consistency.edit/src"
+    editorDirectory="/org.fortiss.consistency.editor/src" modelPluginID="org.fortiss.consistency"
+    modelName="GeometryElements" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="5.0" copyrightFields="false"
+    editPluginID="org.fortiss.consistency.edit" editorPluginID="org.fortiss.consistency.editor"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>geometryElements.ecore</foreignModel>
+  <genPackages prefix="GeometryElements" basePackage="org.fortiss.consistency.viewtypes"
+      resource="XML" disposableProviderFactory="true" ecorePackage="geometryElements.ecore#/">
+    <genClasses ecoreClass="geometryElements.ecore#//Geometry">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference geometryElements.ecore#//Geometry/containedElements"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//GeometryElement">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference geometryElements.ecore#//GeometryElement/containedElements"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//GeometryElement/weight"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference geometryElements.ecore#//GeometryElement/origin"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//GeometryElement/materials"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//PlaceholderElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//PlaceholderElement/type"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//Origin">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Origin/x"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Origin/y"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Origin/z"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//Sphere">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Sphere/diameter"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//Cube">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Cube/length"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//Cuboid">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Cuboid/length"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Cuboid/width"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Cuboid/height"/>
+    </genClasses>
+    <genClasses ecoreClass="geometryElements.ecore#//Plane">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Plane/length"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute geometryElements.ecore#//Plane/width"/>
+    </genClasses>
+  </genPackages>
+  <genPackages prefix="Basics" basePackage="org.fortiss.consistency.viewtypes" resource="XML"
+      disposableProviderFactory="true" ecorePackage="basics.ecore#/">
+    <genClasses image="false" ecoreClass="basics.ecore#//IIdElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute basics.ecore#//IIdElement/id"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="basics.ecore#//INamedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute basics.ecore#//INamedElement/name"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="basics.ecore#//INamedCommentedElement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute basics.ecore#//INamedCommentedElement/comment"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

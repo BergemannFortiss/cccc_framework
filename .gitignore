@@ -1,0 +1,7 @@
+/*/bin/
+/*/build/
+/*/target/
+/target/
+*.rej
+.DS_Store
+._.DS_Store

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="dictionary" nsURI="http://www.fortiss.org/consistency/viewtypes/dictionary"
+    nsPrefix="org.fortiss.consistency.viewtypes.dictionary">
+  <eClassifiers xsi:type="ecore:EClass" name="Dictionary" eSuperTypes="basics.ecore#//IIdElement basics.ecore#//INamedElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="containedElements" upperBound="-1"
+        eType="#//DictionaryElement" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="DictionaryElement" eSuperTypes="basics.ecore#//IIdElement basics.ecore#//INamedCommentedElement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AbsoluteTermEntry" eSuperTypes="#//DictionaryElement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="absoluteTerm" eType="ecore:EClass types.ecore#//IValue"
+        containment="true"/>
+  </eClassifiers>
+</ecore:EPackage>

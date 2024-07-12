@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<paths>
+	
+	<logging internalPath="logs/"></logging>
+
+	<viewtypes internalPath="viewtypeCollection/"></viewtypes>
+
+	<rules internalPath="rules/rules.xml"></rules>
+
+	<links internalPath="links/links.xml"></links>
+
+	<adapters internalPath="registration/adapters.xml"></adapters>
+
+</paths>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/org.fortiss.consistency/generatedViewtypes" modelPluginID="org.fortiss.consistency"
+    modelName="Types" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="5.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true">
+  <foreignModel>types.ecore</foreignModel>
+  <genPackages prefix="Types" basePackage="org.fortiss.consistency.viewtypes" resource="XML"
+      disposableProviderFactory="true" ecorePackage="types.ecore#/">
+    <genClasses ecoreClass="types.ecore#//IType"/>
+    <genClasses ecoreClass="types.ecore#//TypeBoolean"/>
+    <genClasses ecoreClass="types.ecore#//TypeInteger"/>
+    <genClasses ecoreClass="types.ecore#//TypeDouble"/>
+    <genClasses ecoreClass="types.ecore#//TypeString"/>
+    <genClasses ecoreClass="types.ecore#//IValue"/>
+    <genClasses ecoreClass="types.ecore#//ValueBoolean">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueBoolean/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//ValueInteger">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueInteger/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//ValueDouble">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueDouble/value"/>
+    </genClasses>
+    <genClasses ecoreClass="types.ecore#//ValueString">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute types.ecore#//ValueString/value"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

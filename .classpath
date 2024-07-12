@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="generatedViewtypes">
+		<attributes>
+			<attribute name="ignore_optional_problems" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.httpcomponents.httpclient-4.5.14.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.httpcomponents.httpcore-4.4.16.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.datatype.jackson-datatype-jdk8-2.13.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.datatype.jackson-datatype-jsr310-2.13.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.module.jackson-module-parameter-names-2.13.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.yaml.snakeyaml-1.30.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jakarta.annotation.jakarta.annotation-api-1.3.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.tomcat.embed.tomcat-embed-core-9.0.83.jar" sourcepath="lib/org.apache.tomcat.embed.tomcat-embed-core-9.0.83-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.tomcat.embed.tomcat-embed-el-9.0.83.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.apache.tomcat.embed.tomcat-embed-websocket-9.0.83.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javax.servlet.javax.servlet-api-4.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.boot.spring-boot-2.7.18.jar" sourcepath="lib/org.springframework.boot.spring-boot-2.7.18-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.boot.spring-boot-autoconfigure-2.7.18.jar" sourcepath="lib/org.springframework.boot.spring-boot-autoconfigure-2.7.18-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.boot.spring-boot-starter-2.7.18.jar" sourcepath="lib/org.springframework.boot.spring-boot-starter-2.7.18-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.boot.spring-boot-starter-json-2.7.18.jar" sourcepath="lib/org.springframework.boot.spring-boot-starter-json-2.7.18-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.boot.spring-boot-starter-tomcat-2.7.18.jar" sourcepath="lib/org.springframework.boot.spring-boot-starter-tomcat-2.7.18-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.boot.spring-boot-starter-web-2.7.18.jar" sourcepath="lib/org.springframework.boot.spring-boot-starter-web-2.7.18-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-aop-5.3.31.jar" sourcepath="lib/org.springframework.spring-aop-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-beans-5.3.31.jar" sourcepath="lib/org.springframework.spring-beans-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-context-5.3.31.jar" sourcepath="lib/org.springframework.spring-context-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-core-5.3.31.jar" sourcepath="lib/org.springframework.spring-core-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-expression-5.3.31.jar" sourcepath="lib/org.springframework.spring-expression-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-jcl-5.3.31.jar" sourcepath="lib/org.springframework.spring-jcl-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-web-5.3.31.jar" sourcepath="lib/org.springframework.spring-web-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/org.springframework.spring-webmvc-5.3.31.jar" sourcepath="lib/org.springframework.spring-webmvc-5.3.31-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.google.crypto.tink.tink-1.12.0.jar" sourcepath="lib/com.google.crypto.tink.tink-1.12.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.google.protobuf.protobuf-java-3.24.3.jar" sourcepath="lib/com.google.protobuf.protobuf-java-3.24.3-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.google.code.gson.gson-2.10.1.jar" sourcepath="lib/com.google.code.gson.gson-2.10.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.google.code.findbugs.jsr305-3.0.2.jar" sourcepath="lib/com.google.code.findbugs.jsr305-3.0.2-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.google.errorprone.error_prone_annotations-2.22.0.jar" sourcepath="lib/com.google.errorprone.error_prone_annotations-2.22.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.google.http-client.google-http-client-1.43.3.jar" sourcepath="lib/com.google.http-client.google-http-client-1.43.3-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-core_2.16.1.jar" sourcepath="lib/com.fasterxml.jackson.core.jackson-core_2.16.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-annotations_2.16.1.jar" sourcepath="lib/com.fasterxml.jackson.core.jackson-annotations_2.16.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/com.fasterxml.jackson.core.jackson-databind_2.16.1.jar" sourcepath="lib/com.fasterxml.jackson.core.jackson-databind_2.16.1-sources.jar"/>
+	<classpathentry kind="src" path="generated-src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
+		<attributes>
+			<attribute name="module" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="build"/>
+</classpath>

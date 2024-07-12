@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<clearanceAttributes>
+
+	<comment>
+	Here you can list all attributes for whose definitions the clearance 
+	checker will look in this file below.
+	</comment>
+	<possibleAttributes>
+		<attribute listName="roleList">role</attribute>
+		<attribute listName="hierarchyList">hierarchy</attribute>
+		<attribute listName="departmentList">department</attribute>
+		<attribute listName="companyList">company</attribute>
+		<attribute listName="usedToolList">usedTool</attribute>
+		<attribute listName="locationList">location</attribute>
+		<attribute listName="timeList">time</attribute>
+	</possibleAttributes>
+
+
+
+
+	<comment>
+	The entries/elements in the lists below are handled in ascending order. 
+	Meaning if there is any order requested by the clearance definition in 
+	the rules (e.g., with "maximum" and "minimum"), the clearance checker 
+	will treat the first/top element in the defined lists below as minimum 
+	and the last/bottom element as maximum. E.g., if a rule is cleared for 
+	a specific attribute value with the "minimum" flag, this value and all 
+	below it will be assumed as meant. 
+	</comment>
+	
+	<roleList>
+		<role>designer</role>
+		<role>requirements_engineer</role>
+		<role>software_engineer</role>
+		<role>hardware_engineer</role>
+	</roleList>
+	
+	<hierarchyList>
+		<hierarchy>student</hierarchy>
+		<hierarchy>junior</hierarchy>
+		<hierarchy>senior</hierarchy>
+		<hierarchy>leader</hierarchy>
+		<hierarchy>director</hierarchy>
+	</hierarchyList>
+	
+	<departmentList>
+		<department>marketing</department>
+		<department>re</department>
+		<department>mbse</department>
+		<department>production</department>
+	</departmentList>
+	
+	<companyList>
+		<company>unkown</company>
+		<company>supplier</company>
+		<company>oem</company>
+	</companyList>
+	
+	<usedToolList>
+		<usedTool>OM</usedTool>
+		<usedTool>Fusion360</usedTool>
+		<usedTool>AF3</usedTool>
+	</usedToolList>
+	
+	<locationList>
+		<location>external_unsecured_network</location>
+		<location>external_secured_network</location>
+		<location>internal_network</location>
+	</locationList>
+	
+	<timeList>
+		<time>in_working_hours</time>
+		<time>out_working_hours</time>
+	</timeList>
+
+</clearanceAttributes>
