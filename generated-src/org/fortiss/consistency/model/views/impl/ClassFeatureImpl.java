@@ -227,6 +227,16 @@ public class ClassFeatureImpl extends EObjectImpl implements ClassFeature {
 	 * @generated
 	 */
 	@Override
+	public boolean equals(final ClassFeature obj) {
+		return obj.getFeatureName() == this.getFeatureName() && obj.getFeatureClassString() == this.getFeatureClassString() && obj.getOwningClassString() == this.getOwningClassString() && (obj.isIsReference() == this.isIsReference());
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ViewsPackage.CLASS_FEATURE__OWNING_CLASS_STRING:

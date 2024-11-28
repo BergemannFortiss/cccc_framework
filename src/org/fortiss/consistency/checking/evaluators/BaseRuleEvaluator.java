@@ -15,10 +15,6 @@
 +--------------------------------------------------------------------------*/
 package org.fortiss.consistency.checking.evaluators;
 
-import java.util.List;
-
-import org.eclipse.emf.ecore.EPackage;
-import org.fortiss.consistency.configuration.ConsistencyConfiguration;
 import org.fortiss.consistency.exceptions.EvaluatorException;
 import org.fortiss.consistency.model.ConsistencyRule;
 import org.fortiss.consistency.model.RuleCondition;
@@ -32,32 +28,10 @@ import org.fortiss.consistency.model.RuleCondition;
 public abstract class BaseRuleEvaluator implements IRuleEvaluator {
 
 	/**
-	 * All metamodels from which classes, attributes, etc. might be used inside the consistency
-	 * rules. Will be provided by instance creation (constructor call).
-	 */
-	protected List<EPackage> availableMetamodels;
-
-	/**
 	 * The current {@link ConsistencyRule} on which the evaluator should work/evaluate. This
 	 * can/should be set via the setRuleExpression method of the interface.
 	 */
-	protected ConsistencyRule currentRule;
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param config
-	 *            The configuration with all the information needed for this class,
-	 *            especially the available metamodels.
-	 */
-	public BaseRuleEvaluator(ConsistencyConfiguration config) {
-		if(config == null) {
-			this.availableMetamodels = null;
-		} else {
-			this.availableMetamodels = config.getAllAvailableMetamodels();
-		}
-		this.currentRule = null;
-	}
+	protected ConsistencyRule currentRule = null;
 
 	/**
 	 * Returns a {@link EvaluatorException} with a standardized message based on the given action.

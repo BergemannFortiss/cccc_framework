@@ -27,8 +27,8 @@ import static org.fortiss.consistency.configuration.XmlExtractor.parseLinksFromX
 import static org.fortiss.consistency.configuration.XmlExtractor.parsePathsInformationFromXmlFile;
 import static org.fortiss.consistency.configuration.XmlExtractor.parseRulesFromXmlFile;
 import static org.fortiss.consistency.configuration.XmlExtractor.parseSecurityInformationFromXmlFile;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createUserBaseAttributes;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createUserHiddenInformation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createUserBaseAttributes;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createUserHiddenInformation;
 import static org.fortiss.consistency.utils.ConsistencyUtils.appendCausingException;
 
 import java.io.File;
@@ -147,8 +147,12 @@ public class ConfigurationLoader {
 	/**
 	 * Constructor.
 	 * 
+	 * Since this class might be used by different actors (not only the C4, but also by some
+	 * adapters), it is important to not use the general static configuration from the C4, but be
+	 * parameterizable regarding the correct config!
+	 * 
 	 * @param config
-	 *            The configuration in which everything should be loaded.
+	 *            The configuration with all the information needed for this class.
 	 */
 	public ConfigurationLoader(ConsistencyConfiguration config) {
 		this.config = config;
@@ -299,7 +303,7 @@ public class ConfigurationLoader {
 	 * Registers all elements that are needed for the consistency checking process, like rules,
 	 * metamodels, links, based on the their configuration file.
 	 */
-	public void registerAllImportantElementsFromFile() {
+	protected void registerAllImportantElementsFromFile() {
 		registerMainMetamodels();
 		registerAdapters();
 		registerAllGlobalElementLinks();
@@ -308,32 +312,8 @@ public class ConfigurationLoader {
 		registerAllPossibleClearanceAttributes();
 	}
 
-	/** Registers all consistency adapters based on the their configuration file. */
-	private void registerAdapters() {
-		registeredAdapters = new HashMap<>();
-		List<ToolAdapterRegistrationEntry> adapters = new ArrayList<>();
-
-		File adapterFile = config.getCentralResourceFile(adaptersFilePath);
-		if(adapterFile == null) {
-			config.logError(
-					"Tool adapters could not be registered correctly, because adapter registration file could not be found/read.");
-			return;
-		}
-		try {
-			adapters.addAll(parseAdaptersFromXmlFile(adapterFile, config));
-		} catch(IOException e) {
-			config.logError(
-					appendCausingException("Tool adapters could not be registered correctly.", e));
-			return;
-		}
-
-		for(ToolAdapterRegistrationEntry entry : adapters) {
-			registeredAdapters.put(entry.getAdapterIdentifier(), entry);
-		}
-	}
-
 	/** Registers all consistency metamodels/viewtypes based on the their configuration file. */
-	private void registerMainMetamodels() {
+	protected void registerMainMetamodels() {
 		// Needs to be done when the packages are used by an application outside of Eclipse to be
 		// able to serialize and deserialize correctly the consistency model element types.
 		org.fortiss.consistency.model.ConsistencyPackage.eINSTANCE.eClass();
@@ -393,6 +373,30 @@ public class ConfigurationLoader {
 					loadedMetamodels.add(metaModelPackage);
 				}
 			}
+		}
+	}
+
+	/** Registers all consistency adapters based on the their configuration file. */
+	private void registerAdapters() {
+		registeredAdapters = new HashMap<>();
+		List<ToolAdapterRegistrationEntry> adapters = new ArrayList<>();
+
+		File adapterFile = config.getCentralResourceFile(adaptersFilePath);
+		if(adapterFile == null) {
+			config.logError(
+					"Tool adapters could not be registered correctly, because adapter registration file could not be found/read.");
+			return;
+		}
+		try {
+			adapters.addAll(parseAdaptersFromXmlFile(adapterFile, config));
+		} catch(IOException e) {
+			config.logError(
+					appendCausingException("Tool adapters could not be registered correctly.", e));
+			return;
+		}
+
+		for(ToolAdapterRegistrationEntry entry : adapters) {
+			registeredAdapters.put(entry.getAdapterIdentifier(), entry);
 		}
 	}
 

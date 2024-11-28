@@ -117,4 +117,15 @@ public interface ClassFeature extends EObject {
 	 */
 	void setIsReference(boolean value);
 
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * @Override
+	 * <!-- end-model-doc -->
+	 * @model
+	 * @generated
+	 */
+	boolean equals(ClassFeature obj);
+
 } // ClassFeature

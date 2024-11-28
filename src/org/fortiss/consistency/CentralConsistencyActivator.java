@@ -16,14 +16,18 @@
 package org.fortiss.consistency;
 
 import static org.eclipse.core.runtime.FileLocator.toFileURL;
+import static org.eclipse.core.runtime.Status.OK_STATUS;
 
 import java.io.File;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -44,24 +48,23 @@ public class CentralConsistencyActivator extends Plugin {
 	public static final String RESOURCE_DIRECTORY_PATH = "res/";
 
 	/**
-	 * The flag whether the consistency environment, i.e., the central checker instance, should be
-	 * started together with Eclipse (with this activator) or without Eclipse (then externally via
-	 * the separately built standalone jar of the checker).
+	 * The flag whether the central consistency environment, i.e., the central checker instance
+	 * (including central consistency server), should be started with Eclipse (with this activator)
+	 * directly at the beginning or manually by the user who needs to start it either externally via
+	 * the separately built standalone jar of the checker or internally via an UI implementation of
+	 * a tool that will then call/start the environment itself.
 	 */
-	private static final boolean START_CONSISTENCY_ENVIRONMENT_WITH_ECLIPSE = true;
+	private static final boolean AUTOMATICALLY_START_CONSISTENCY_ENVIRONMENT_WITH_ECLIPSE = false;
 
 	/** The shared instance. */
 	private static CentralConsistencyActivator plugin;
 
 	/** The consistency environment that starts everything. */
-	private CentralConsistencyEnvironment consistencyEnvironment;
+	private CentralConsistencyEnvironment centralConsistencyEnvironment;
 
 	/** Constructor. */
 	public CentralConsistencyActivator() {
-		if(START_CONSISTENCY_ENVIRONMENT_WITH_ECLIPSE) {
-			String resourcePath = getGlobalConsistencyResourcePath();
-			consistencyEnvironment = new CentralConsistencyEnvironment(resourcePath);
-		}
+		// Do nothing.
 	}
 
 	/** {@inheritDoc} */
@@ -70,28 +73,56 @@ public class CentralConsistencyActivator extends Plugin {
 		super.start(context);
 		plugin = this;
 
-		if(START_CONSISTENCY_ENVIRONMENT_WITH_ECLIPSE) {
-			// Since the setup can take some seconds but is not dependent on other plugins and
-			// vice versa, it is more efficient to let it run in a separate thread without blocking
-			// the other plugin setups.
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					consistencyEnvironment.start();
-				}
-			}).start();
+		if(AUTOMATICALLY_START_CONSISTENCY_ENVIRONMENT_WITH_ECLIPSE) {
+			setUpAndStartCentralConsistencyEnvironment();
 		}
 	}
 
 	/** {@inheritDoc} */
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		if(START_CONSISTENCY_ENVIRONMENT_WITH_ECLIPSE) {
-			consistencyEnvironment.stop();
-		}
-
+		stopCentralConsistencyEnvironment();
 		plugin = null;
 		super.stop(context);
+	}
+
+	/**
+	 * Sets up and afterwards starts the central consistency environment in a separate thread/job.
+	 * 
+	 * This should be either called by the activator plugin when it should be executed automatically
+	 * during startup or can be called manually by any other (UI) plugin if the consistency
+	 * environment should be started at a specific (later) time.
+	 */
+	public void setUpAndStartCentralConsistencyEnvironment() {
+		centralConsistencyEnvironment = CentralConsistencyEnvironment.getInstance();
+		// Since the setup can take some seconds but is not dependent on other plugins and
+		// vice versa, it is more efficient to let it run in a separate thread/job without
+		// blocking the other plugin setups.
+		Job job = new Job("Starting the central consistency environment") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				String resourcePath = getGlobalConsistencyResourcePath();
+				centralConsistencyEnvironment.load(resourcePath);
+				centralConsistencyEnvironment.start();
+
+				return OK_STATUS;
+			}
+		};
+		job.setUser(false);
+		job.schedule();
+	}
+
+	/**
+	 * Stops the central consistency environment if it is active.
+	 * 
+	 * This should be either called by the activator plugin when it should be executed automatically
+	 * during termination or can be called manually by any other (UI) plugin if the consistency
+	 * environment should be stopped at a specific (later) time.
+	 */
+	public void stopCentralConsistencyEnvironment() {
+		if(centralConsistencyEnvironment != null) {
+			centralConsistencyEnvironment.stop();
+		}
 	}
 
 	/**

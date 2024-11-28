@@ -31,8 +31,17 @@ import org.fortiss.consistency.model.views.ClassFeature;
 public interface IRuleEvaluator {
 
 	/**
+	 * Returns the name of the implemented evaluator. This is mainly used as identifier within
+	 * exception messages.
+	 * 
+	 * @return The name of the rule evaluator.
+	 */
+	public String getEvaluatorName();
+
+	/**
 	 * Sets up the evaluator environment so that the evaluator can be used as wanted. This is done
-	 * once in the beginning when the consistency process is started.
+	 * once in the beginning when the consistency process is started. If the chosen evaluator does
+	 * not need an initial setup, it can just be implemented as empty function.
 	 */
 	public void performInitialSetup();
 
@@ -81,12 +90,4 @@ public interface IRuleEvaluator {
 	 */
 	public List<ClassFeature> getClassFeaturesFromCurrentRule()
 			throws EvaluatorException, ClassNotFoundException;
-
-	/**
-	 * Returns the name of the implemented evaluator. This is mainly used as identifier within
-	 * exception messages.
-	 * 
-	 * @return The name of the rule evaluator.
-	 */
-	public String getEvaluatorName();
 }

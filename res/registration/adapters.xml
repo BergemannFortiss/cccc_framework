@@ -25,4 +25,12 @@
 		<encryptionPublicKeyFile>security/cryptography/adapters/public_Fusion360_DHKEM_X25519_HKDF_SHA256_HKDF_SHA256_AES_256_GCM.json</encryptionPublicKeyFile>
 	</registeredAdapter>
 
+	<registeredAdapter>
+		<adapterIdentifier>BaSys</adapterIdentifier>
+		<fullName>Basissystem Industrie 4.0</fullName>
+		<dataServerHostAddress>127.0.0.1</dataServerHostAddress>
+		<dataServerPort>6400</dataServerPort>
+		<encryptionPublicKeyFile>security/cryptography/adapters/public_BaSys_DHKEM_X25519_HKDF_SHA256_HKDF_SHA256_AES_256_GCM.json</encryptionPublicKeyFile>
+	</registeredAdapter>
+
 </adapters>

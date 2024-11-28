@@ -15,6 +15,7 @@
 +--------------------------------------------------------------------------*/
 package org.fortiss.consistency.security.clearance;
 
+import static java.util.Collections.emptyList;
 import static org.fortiss.consistency.model.ClearanceBasis.ALL;
 import static org.fortiss.consistency.model.FeedbackLevel.CAUSE_WARNING;
 import static org.fortiss.consistency.model.FeedbackLevel.FULL_WARNING;
@@ -54,10 +55,14 @@ import org.fortiss.consistency.model.communication.UserToken;
 public class ClearanceManager {
 
 	/** The configuration that has all the basic consistency information. */
-	private ConsistencyConfiguration config;
+	protected ConsistencyConfiguration config;
 
 	/**
 	 * Constructor.
+	 * 
+	 * Since this class might be used by different actors (not only the C4, but also by some
+	 * adapters), it is important to not use the general static configuration from the C4, but be
+	 * parameterizable regarding the correct config!
 	 * 
 	 * @param config
 	 *            The configuration with all the information needed for this class.
@@ -94,7 +99,6 @@ public class ClearanceManager {
 	 * @return True if the given user has the clearance for the given rule, otherwise false.
 	 */
 	public boolean hasClearanceForRule(UserDetailedInformation userInfo, ConsistencyRule rule) {
-
 		if(rule == null) {
 			// No given rule means no given clearance definition and for this everyone has
 			// clearance.
@@ -278,14 +282,13 @@ public class ClearanceManager {
 	 */
 	private List<String> getAllMatchingAttributeValues(ExceptionAttribute attribute,
 			String comparisonAttributeValue, MatchType matchType) {
-
 		HashMap<String, List<String>> attributes = config.getAllPossibleClearanceAttributes();
 		if(attributes == null) {
-			return new ArrayList<>();
+			return emptyList();
 		}
 		String attributeName = attribute.getAttributeName();
 		if(attributeName == null) {
-			return new ArrayList<>();
+			return emptyList();
 		}
 		if(attributes.containsKey(attributeName)) {
 			List<String> allAttributeValues = attributes.get(attributeName);
@@ -302,6 +305,6 @@ public class ClearanceManager {
 			}
 		}
 
-		return new ArrayList<>();
+		return emptyList();
 	}
 }

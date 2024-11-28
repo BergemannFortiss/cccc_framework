@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EOperation;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 
@@ -344,6 +345,9 @@ public class ViewsPackageImpl extends EPackageImpl implements ViewsPackage {
 		initEAttribute(getClassFeature_FeatureName(), ecorePackage.getEString(), "featureName", null, 0, 1, ClassFeature.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getClassFeature_FeatureClassString(), ecorePackage.getEString(), "featureClassString", null, 0, 1, ClassFeature.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getClassFeature_IsReference(), ecorePackage.getEBoolean(), "isReference", null, 0, 1, ClassFeature.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		EOperation op = addEOperation(classFeatureEClass, ecorePackage.getEBoolean(), "equals", 0, 1, IS_UNIQUE, IS_ORDERED);
+		addEParameter(op, this.getClassFeature(), "obj", 0, 1, IS_UNIQUE, IS_ORDERED);
 
 		initEClass(classStringToClassFeaturesMapEntryEClass, Map.Entry.class, "ClassStringToClassFeaturesMapEntry", !IS_ABSTRACT, !IS_INTERFACE, !IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getClassStringToClassFeaturesMapEntry_Key(), ecorePackage.getEString(), "key", null, 0, 1, Map.Entry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

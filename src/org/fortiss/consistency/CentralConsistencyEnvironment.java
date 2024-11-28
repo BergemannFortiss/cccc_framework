@@ -18,7 +18,7 @@ package org.fortiss.consistency;
 import static org.fortiss.consistency.utils.ConsistencyUtils.appendCausingException;
 
 import org.fortiss.consistency.checking.evaluators.IRuleEvaluator;
-import org.fortiss.consistency.communication.ConsistencyServer;
+import org.fortiss.consistency.communication.CentralConsistencyServer;
 import org.fortiss.consistency.configuration.ConsistencyConfiguration;
 import org.fortiss.consistency.security.encryption.IEncryptionManager;
 
@@ -29,36 +29,83 @@ import org.fortiss.consistency.security.encryption.IEncryptionManager;
  */
 public class CentralConsistencyEnvironment {
 
-	/** The current instance. */
-	private static CentralConsistencyEnvironment currentConsistencyEnvironment;
+	/** Singleton instance (is only created if actually needed, i.e., on first usage). */
+	private static CentralConsistencyEnvironment SINGLETON_INSTANCE;
 
 	/** The configuration that has all the basic consistency information. */
-	private static ConsistencyConfiguration config;
+	private ConsistencyConfiguration config;
 	/** The server for communicating with the adapters. */
-	private ConsistencyServer server;
+	private CentralConsistencyServer server;
+	/** Flag whether the environment was started and is still running (or not). */
+	private boolean isRunning;
 
 	/** Elapsed time of logger setup (in milliseconds). */
-	private double loggerSetupTime = 0.0;
+	private double loggerSetupTime;
 	/** Elapsed time of registering elements (in milliseconds). */
-	private double registerTime = 0.0;
+	private double registerTime;
 	/** Elapsed time of evaluator setup (in milliseconds). */
-	private double evaluatorSetupTime = 0.0;
+	private double evaluatorSetupTime;
 	/** Elapsed time of security setup (in milliseconds). */
-	private double securitySetupTime = 0.0;
+	private double securitySetupTime;
 	/** Elapsed time of server setup (in milliseconds). */
-	private double serverSetupTime = 0.0;
+	private double serverSetupTime;
+
+	/** Local singleton constructor (therefore only private). */
+	private CentralConsistencyEnvironment() {
+		isRunning = false;
+		loggerSetupTime = 0.0;
+		registerTime = 0.0;
+		evaluatorSetupTime = 0.0;
+		securitySetupTime = 0.0;
+		serverSetupTime = 0.0;
+	}
 
 	/**
-	 * Constructor.
+	 * Returns the singleton instance of the {@link CentralConsistencyEnvironment}. The singleton is
+	 * not automatically created, but only when really used, which is why the first usage of this
+	 * getter will instantiate the singleton.
+	 * 
+	 * @return The singleton instance of the consistency environment.
+	 */
+	public static synchronized CentralConsistencyEnvironment getInstance() {
+		if(SINGLETON_INSTANCE == null) {
+			SINGLETON_INSTANCE = new CentralConsistencyEnvironment();
+		}
+		return SINGLETON_INSTANCE;
+	}
+
+	/**
+	 * Returns whether the {@link CentralConsistencyEnvironment} instance exists and its
+	 * configuration is loaded.
+	 * 
+	 * @return True if the environment exists and is loaded, otherwise false.
+	 */
+	public static synchronized boolean isLoaded() {
+		return SINGLETON_INSTANCE != null && SINGLETON_INSTANCE.config != null &&
+				SINGLETON_INSTANCE.config.isConfigurationLoaded();
+	}
+
+	/**
+	 * Returns whether the {@link CentralConsistencyEnvironment} instance exists, its configuration
+	 * is loaded, and was also started, i.e., it is running/active.
+	 * 
+	 * @return True if the environment is running (loaded and started), otherwise false.
+	 */
+	public static synchronized boolean isRunning() {
+		return isLoaded() && SINGLETON_INSTANCE.isRunning;
+	}
+
+	/**
+	 * Loads the configuration of the consistency environment. This must be done before the
+	 * environment is started! The input for the configuration is taken from the given resource
+	 * directory.
 	 * 
 	 * @param resourceDirectoryPath
-	 *            The path to the resource directory in which all the important files are searched
-	 *            for.
+	 *            The path to the resource directory with all configuration/setting files.
 	 */
-	public CentralConsistencyEnvironment(String resourceDirectoryPath) {
-		// Set up the configuration and load the given configuration files.
+	public void load(String resourceDirectoryPath) {
 		config = new ConsistencyConfiguration(resourceDirectoryPath);
-		config.logInfo("Consistency environment is loading configuration.");
+		config.logInfo("Consistency environment is loading configuration ...");
 		config.loadConfiguration();
 		if(config.isConfigurationLoaded()) {
 			config.logInfo(
@@ -72,12 +119,11 @@ public class CentralConsistencyEnvironment {
 	/** Starts the consistency environment including all necessary setups. */
 	public void start() {
 		config.logInfo("Consistency environment is starting.");
-		currentConsistencyEnvironment = this;
 		boolean success = false;
 
 		if(!config.isConfigurationLoaded()) {
 			config.logError(
-					"Consistency environment is not active, because settings could not be loaded.");
+					"Consistency environment could not be started (and is therefore not active), because settings were not loaded beforehand.");
 			return;
 		}
 
@@ -97,7 +143,7 @@ public class CentralConsistencyEnvironment {
 		long startTime = System.nanoTime();
 		errorMessage =
 				"Consistency environment is not active, because server could not be started.";
-		server = new ConsistencyServer(config);
+		server = new CentralConsistencyServer();
 		success = server.start();
 		if(!success) {
 			config.logError(errorMessage);
@@ -118,41 +164,41 @@ public class CentralConsistencyEnvironment {
 				loggerSetupTime, registerTime, evaluatorSetupTime, securitySetupTime,
 				serverSetupTime, totalTime);
 		config.logInfo(finishMessage + "\n");
+		isRunning = true;
 	}
 
 	/** Stops the consistency environment, especially the server. */
 	public void stop() {
 		if(server != null) {
 			server.stop();
+			server = null;
 		}
-
-		currentConsistencyEnvironment = null;
+		config = null;
+		isRunning = false;
+		SINGLETON_INSTANCE = null;
 	}
 
-	/** Refreshes the registered elements based on their current (configuration) files. */
+	/**
+	 * Returns the current configuration of the consistency environment instance.
+	 * 
+	 * @return The current configuration of the consistency environment instance.
+	 */
+	public ConsistencyConfiguration getConfiguration() {
+		return config;
+	}
+
+	/**
+	 * Refreshes the registered elements based on their current (configuration)
+	 * files.
+	 */
 	public void refreshRegistration() {
 		config.registerAllElements();
 	}
 
 	/**
-	 * Returns the current environment instance.
-	 * 
-	 * @return The current environment instance.
+	 * Executes once all initial setup tasks for the consistency checking
+	 * environment.
 	 */
-	public static CentralConsistencyEnvironment getCurrentConsistencyEnvironment() {
-		return currentConsistencyEnvironment;
-	}
-
-	/**
-	 * Returns the current configuration instance.
-	 * 
-	 * @return The current configuration instance.
-	 */
-	public static ConsistencyConfiguration getCurrentConsistencyConfiguration() {
-		return config;
-	}
-
-	/** Executes once all initial setup tasks for the consistency checking environment. */
 	private boolean executeAllNeededSetups() throws NumberFormatException {
 		// Set up logger.
 		long startTime = System.nanoTime();
@@ -176,10 +222,11 @@ public class CentralConsistencyEnvironment {
 
 		// Evaluator.
 		startTime = System.nanoTime();
-		IRuleEvaluator shallowEvaluator = config.getNewShallowEvaluatorInstance();
-		config.logInfo("Chosen consistency evaluator: " + shallowEvaluator.getEvaluatorName() +
-				". Setting it up ...");
-		shallowEvaluator.performInitialSetup();
+		config.logInfo("Setting evaluator up ...");
+		IRuleEvaluator evaluator = config.getNewEvaluatorInstance();
+		evaluator.performInitialSetup();
+		config.logInfo(
+				"Chosen consistency evaluator '" + evaluator.getEvaluatorName() + "' is set up.");
 		evaluatorSetupTime = (System.nanoTime() - startTime) * 0.000001;
 
 		// Security.

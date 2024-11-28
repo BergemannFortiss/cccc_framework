@@ -205,6 +205,13 @@
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="Model element representing a feature of a class, e.g., a class attribute."/>
       </eAnnotations>
+      <eOperations name="equals" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="@Override"/>
+          <details key="body" value="return obj.getFeatureName() == this.getFeatureName() &amp;&amp; obj.getFeatureClassString() == this.getFeatureClassString() &amp;&amp; obj.getOwningClassString() == this.getOwningClassString() &amp;&amp; (obj.isIsReference() == this.isIsReference());"/>
+        </eAnnotations>
+        <eParameters name="obj" eType="#//views/ClassFeature"/>
+      </eOperations>
       <eStructuralFeatures xsi:type="ecore:EAttribute" name="owningClassString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
       <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
       <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureClassString" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

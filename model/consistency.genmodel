@@ -119,6 +119,10 @@
         <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/featureName"/>
         <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/featureClassString"/>
         <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassFeature/isReference"/>
+        <genOperations ecoreOperation="consistency.ecore#//views/ClassFeature/equals"
+            body="return obj.getFeatureName() == this.getFeatureName() &amp;&amp; obj.getFeatureClassString() == this.getFeatureClassString() &amp;&amp; obj.getOwningClassString() == this.getOwningClassString() &amp;&amp; (obj.isIsReference() == this.isIsReference());">
+          <genParameters ecoreParameter="consistency.ecore#//views/ClassFeature/equals/obj"/>
+        </genOperations>
       </genClasses>
       <genClasses ecoreClass="consistency.ecore#//views/ClassStringToClassFeaturesMapEntry">
         <genFeatures createChild="false" ecoreFeature="ecore:EAttribute consistency.ecore#//views/ClassStringToClassFeaturesMapEntry/key"/>

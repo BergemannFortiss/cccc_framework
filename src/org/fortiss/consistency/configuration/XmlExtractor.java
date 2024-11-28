@@ -16,18 +16,23 @@
 package org.fortiss.consistency.configuration;
 
 import static javax.xml.XMLConstants.FEATURE_SECURE_PROCESSING;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createAbstractElementRelation;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createClearance;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createConfidentialityStatus;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createConsistencyRule;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createExceptionAttribute;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createExceptionEntry;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createFeedbackLevelClearance;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createFullBasicElementInformation;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createRelationTargetInformation;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createRuleElement;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createToolAdapterRegistrationEntry;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.generateUniqueIdentifierBasedOnElemInfo;
+import static org.fortiss.consistency.model.ClearanceBasis.ALL;
+import static org.fortiss.consistency.model.ClearanceBasis.NONE;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createAbstractElementRelation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createClearance;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createConfidentialityStatus;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createConsistencyRule;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createExceptionAttribute;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createExceptionEntry;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createFeedbackLevelClearance;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createFullBasicElementInformation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createRelationTargetInformation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createRuleElement;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createToolAdapterRegistrationEntry;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.generateUniqueIdentifierBasedOnElemInfo;
+import static org.fortiss.consistency.model.MatchType.IDENTICAL;
+import static org.fortiss.consistency.model.MatchType.MAXIMUM;
+import static org.fortiss.consistency.model.MatchType.MINIMUM;
 import static org.w3c.dom.Node.ELEMENT_NODE;
 
 import java.io.File;
@@ -481,7 +486,7 @@ public class XmlExtractor {
 
 			// Get rule confidentiality information.
 			ConfidentialityStatus confidentialityStatus =
-					extractConfidentialityStatusFromRule(ruleElement);
+					extractConfidentialityStatusFromRule(ruleElement, config);
 
 			// Create rule object with all extracted information and add it.
 			ConsistencyRule rule = createConsistencyRule(ruleName, comment, scopeClasses,
@@ -496,7 +501,8 @@ public class XmlExtractor {
 	 * Extracts and returns the confidentiality status from the given rule (element) if it has one,
 	 * otherwise null is returned.
 	 */
-	private static ConfidentialityStatus extractConfidentialityStatusFromRule(Element ruleElement) {
+	private static ConfidentialityStatus extractConfidentialityStatusFromRule(Element ruleElement,
+			ConsistencyConfiguration config) {
 		Element confidentialityElement =
 				getFirstInternalXmlElementByName(ruleElement, "confidentialityStatus");
 		if(confidentialityElement == null) {
@@ -508,7 +514,7 @@ public class XmlExtractor {
 		Element ruleClearanceElement =
 				getFirstInternalXmlElementByName(confidentialityElement, "ruleClearance");
 		if(ruleClearanceElement != null) {
-			ruleClearance = getClearance(ruleClearanceElement);
+			ruleClearance = getClearance(ruleClearanceElement, config);
 		}
 
 		// Get the feedback detail level.
@@ -519,19 +525,19 @@ public class XmlExtractor {
 			Element inconsistencyWarningClearanceElement = getFirstInternalXmlElementByName(
 					feedbackLevelElement, "inconsistencyWarningClearance");
 			Clearance inconsistencyWarningClearance =
-					getClearance(inconsistencyWarningClearanceElement);
+					getClearance(inconsistencyWarningClearanceElement, config);
 
 			Element ruleWarningClearanceElement =
 					getFirstInternalXmlElementByName(feedbackLevelElement, "ruleWarningClearance");
-			Clearance ruleWarningClearance = getClearance(ruleWarningClearanceElement);
+			Clearance ruleWarningClearance = getClearance(ruleWarningClearanceElement, config);
 
 			Element causeWarningClearanceElement =
 					getFirstInternalXmlElementByName(feedbackLevelElement, "causeWarningClearance");
-			Clearance causeWarningClearance = getClearance(causeWarningClearanceElement);
+			Clearance causeWarningClearance = getClearance(causeWarningClearanceElement, config);
 
 			Element fullWarningClearanceElement =
 					getFirstInternalXmlElementByName(feedbackLevelElement, "fullWarningClearance");
-			Clearance fullWarningClearance = getClearance(fullWarningClearanceElement);
+			Clearance fullWarningClearance = getClearance(fullWarningClearanceElement, config);
 
 			feedbackLevelClearance = createFeedbackLevelClearance(inconsistencyWarningClearance,
 					ruleWarningClearance, causeWarningClearance, fullWarningClearance);
@@ -546,7 +552,8 @@ public class XmlExtractor {
 	/**
 	 * Returns a created clearance element from the given XML element representing the clearance.
 	 */
-	private static Clearance getClearance(Element clearanceElement) {
+	private static Clearance getClearance(Element clearanceElement,
+			ConsistencyConfiguration config) {
 		if(clearanceElement == null) {
 			return null;
 		}
@@ -555,11 +562,18 @@ public class XmlExtractor {
 		ClearanceBasis clearanceBasis = null;
 		switch(clearanceBasisString) {
 			case "all":
-				clearanceBasis = ClearanceBasis.ALL;
+				clearanceBasis = ALL;
 				break;
 			case "none":
-				clearanceBasis = ClearanceBasis.NONE;
+				clearanceBasis = NONE;
 				break;
+			default:
+				// If it is neither "all" nor "none", we handle it as the safer variant "none".
+				clearanceBasis = NONE;
+				config.logWarning(
+						"The 'basis' element of a rule clearance element is neither 'all' nor 'none' but '" +
+								clearanceBasisString +
+								"'. It will be handled as 'none'. If this is not correct, please control your rule set.");
 		}
 
 		// Identify all exceptions for the previously identified basis/starting point.
@@ -572,7 +586,7 @@ public class XmlExtractor {
 			List<ExceptionAttribute> exceptionAttributes = new ArrayList<>();
 			for(String attributeName : currentAttributeNames) {
 				ExceptionAttribute attribute =
-						getAttributeOfExceptionByName(exceptionElement, attributeName);
+						getAttributeOfExceptionByName(exceptionElement, attributeName, config);
 				if(attribute != null) {
 					exceptionAttributes.add(attribute);
 				}
@@ -585,7 +599,7 @@ public class XmlExtractor {
 
 	/** Returns a created exception attribute based on the given attribute name. */
 	private static ExceptionAttribute getAttributeOfExceptionByName(Element exceptionElement,
-			String attributeName) {
+			String attributeName, ConsistencyConfiguration config) {
 		Element attributeElement =
 				getFirstInternalXmlElementByName(exceptionElement, attributeName);
 		if(attributeElement == null) {
@@ -598,14 +612,22 @@ public class XmlExtractor {
 		if(matchTypeString != null) {
 			switch(matchTypeString) {
 				case "identical":
-					matchType = MatchType.IDENTICAL;
+					matchType = IDENTICAL;
 					break;
 				case "maximum":
-					matchType = MatchType.MAXIMUM;
+					matchType = MAXIMUM;
 					break;
 				case "minimum":
-					matchType = MatchType.MINIMUM;
+					matchType = MINIMUM;
 					break;
+				default:
+					// If it is neither of the above, we handle it as 'identical' since this will be
+					// the most usual case.
+					matchType = IDENTICAL;
+					config.logWarning(
+							"The 'matchType' element of a rule exception element is not among the expected ones but '" +
+									matchTypeString +
+									"'. It will be handled as 'identical'. If this is not correct, please control your rule set.");
 			}
 		}
 

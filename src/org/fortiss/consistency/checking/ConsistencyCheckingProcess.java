@@ -17,22 +17,20 @@ package org.fortiss.consistency.checking;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static org.fortiss.consistency.model.FeedbackLevel.CAUSE_WARNING;
-import static org.fortiss.consistency.model.FeedbackLevel.INCONSISTENCY_WARNING;
-import static org.fortiss.consistency.model.FeedbackLevel.RULE_WARNING;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createBlockedViolation;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createConsistencyView;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createConsistencyViewtypeWithLists;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createExceptionViolation;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createInconsistencyViolation;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createModelDataRequest;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createTriggerFeedback;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.generateConsistencyUUID;
+import static java.util.stream.Collectors.toList;
+import static org.eclipse.emf.ecore.util.EcoreUtil.copy;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createBlockedViolation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createConsistencyView;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createConsistencyViewtypeWithLists;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createExceptionViolation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createInconsistencyViolation;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createModelDataRequest;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createTriggerFeedback;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.generateConsistencyUUID;
 import static org.fortiss.consistency.utils.ConsistencyUtils.appendCausingException;
 import static org.fortiss.consistency.utils.ConsistencyUtils.createContextWrapperBasedOnData;
 import static org.fortiss.consistency.utils.ConsistencyUtils.getAllLinkedInstancesOf;
 import static org.fortiss.consistency.utils.ConsistencyUtils.getAllRuleElementsOfRule;
-import static org.fortiss.consistency.utils.ConsistencyUtils.getAllSuperClassesOf;
 import static org.fortiss.consistency.utils.ConsistencyUtils.getClassFromString;
 import static org.fortiss.consistency.utils.ConsistencyUtils.getElementClassFromInfo;
 
@@ -47,12 +45,12 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.util.EMap;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.fortiss.consistency.CentralConsistencyEnvironment;
 import org.fortiss.consistency.checking.evaluators.IRuleEvaluator;
 import org.fortiss.consistency.communication.DataRequester;
 import org.fortiss.consistency.configuration.ConsistencyConfiguration;
@@ -98,23 +96,21 @@ public class ConsistencyCheckingProcess {
 	/**
 	 * Constructor.
 	 * 
-	 * @param config
-	 *            The configuration with all the information needed for this class.
 	 * @param triggeringAdapterIdentifier
 	 *            The adapter via which the process was triggered.
 	 * @param userInfo
 	 *            Information about the user who has triggered this process.
 	 */
-	public ConsistencyCheckingProcess(ConsistencyConfiguration config,
-			String triggeringAdapterIdentifier, UserDetailedInformation userInfo) {
-		this.config = config;
+	public ConsistencyCheckingProcess(String triggeringAdapterIdentifier,
+			UserDetailedInformation userInfo) {
+		this.config = CentralConsistencyEnvironment.getInstance().getConfiguration();
 		this.processUuid = generateConsistencyUUID();
 		config.logInternal("The consistency adapter of " + triggeringAdapterIdentifier +
 				" has triggered a consistency checking process (UUID: " + processUuid +
 				"). User behind this request: " + userInfo);
 		this.userInfo = userInfo;
 		this.metamodelPackages = config.getAllAvailableMetamodels();
-		this.evaluator = config.getNewDeepEvaluatorInstance();
+		this.evaluator = config.getNewEvaluatorInstance();
 	}
 
 	/** Stops the whole checking process and cleans up. */
@@ -141,14 +137,18 @@ public class ConsistencyCheckingProcess {
 		} catch(ClassNotFoundException e) {
 			String ownMessage =
 					"All rule evaluations were skipped, because a needed class from the initial element information could not be found.";
-			ConsistencyViolation exceptionViolation = createExceptionViolation(
-					"Overall Check Violation", null, appendCausingException(ownMessage, e));
+			String exceptionCause = appendCausingException(ownMessage, e);
+			ConsistencyViolation exceptionViolation =
+					createExceptionViolation("Overall Check Violation", null, exceptionCause);
 			List<ConsistencyViolation> overallViolation = new ArrayList<>();
 			overallViolation.add(exceptionViolation);
 			int evaluatedRulesCounter = 0;
 			int performedEvaluationsCounter = 0;
 			TriggerFeedback feedback = createTriggerFeedback(evaluatedRulesCounter,
 					performedEvaluationsCounter, overallViolation);
+			config.logInfo("Consistency feedback for consistency checking process '" + processUuid +
+					"': An overall violation was found due to this exception:\n\t" +
+					exceptionCause);
 			return feedback;
 		}
 
@@ -158,60 +158,67 @@ public class ConsistencyCheckingProcess {
 		// 3. Filter feedback (found violations) by user attributes.
 		int hiddenCounter = 0;
 		ClearanceManager clearanceManager = config.getClearanceManager();
-		String internalLoggingOfViolations = "";
+		StringBuffer internalLoggingOfViolations = new StringBuffer("");
 		for(ConsistencyViolation violation : foundViolations) {
-			boolean restrictedFeedback = false;
-			FeedbackLevel highestFeedbackLevel = clearanceManager
-					.getHighestClearedFeedbackLevel(userInfo, violation.getViolatedRule());
-			if(highestFeedbackLevel == INCONSISTENCY_WARNING) {
-				violation.setName("Hidden");
-				violation.setViolatedRule(null);
-				restrictedFeedback = true;
-			}
-			if(highestFeedbackLevel == INCONSISTENCY_WARNING ||
-					highestFeedbackLevel == RULE_WARNING) {
-				violation.setCause("Hidden");
-				restrictedFeedback = true;
-			}
-			if(highestFeedbackLevel == INCONSISTENCY_WARNING ||
-					highestFeedbackLevel == RULE_WARNING || highestFeedbackLevel == CAUSE_WARNING) {
-				violation.setUsedContextData(null);
-				restrictedFeedback = true;
-			}
-			if(restrictedFeedback) {
-				hiddenCounter++;
-			}
-
-			internalLoggingOfViolations += "############";
-			internalLoggingOfViolations += "\n- Violation name: '" + violation.getName() + "'.";
-			internalLoggingOfViolations +=
-					"\n- Violation type: '" + violation.getViolationType() + "'.";
-			internalLoggingOfViolations += "\n- Violation type explanation: '" +
-					violation.getViolationTypeExplanation() + "'.";
+			// 1. Internally log the violation (without already hidden values).
+			internalLoggingOfViolations.append("############");
+			internalLoggingOfViolations
+					.append("\n- Violation name: '" + violation.getName() + "'.");
+			internalLoggingOfViolations
+					.append("\n- Violation type: '" + violation.getViolationType() + "'.");
+			internalLoggingOfViolations.append("\n- Violation type explanation: '" +
+					violation.getViolationTypeExplanation() + "'.");
 			ConsistencyRule rule = violation.getViolatedRule();
 			if(rule == null) {
-				internalLoggingOfViolations += "\n- Violation rule: 'Not available'.";
+				internalLoggingOfViolations.append("\n- Violation rule: 'Not available'.");
 			} else {
-				internalLoggingOfViolations += "\n- Violation rule name: '" + rule.getName() + "'.";
-				internalLoggingOfViolations +=
-						"\n- Violation rule comment: '" + rule.getComment() + "'.";
-				internalLoggingOfViolations += "\n- Violation rule original condition: '" +
-						rule.getRuleCondition().getOriginalExpression() + "'.";
-				internalLoggingOfViolations += "\n- Violation rule modified condition: '" +
-						rule.getRuleCondition().getModifiedExpression() + "'.";
+				internalLoggingOfViolations
+						.append("\n- Violation rule name: '" + rule.getName() + "'.");
+				internalLoggingOfViolations
+						.append("\n- Violation rule comment: '" + rule.getComment() + "'.");
+				internalLoggingOfViolations.append("\n- Violation rule original condition: '" +
+						rule.getRuleCondition().getOriginalExpression() + "'.");
+				internalLoggingOfViolations.append("\n- Violation rule modified condition: '" +
+						rule.getRuleCondition().getModifiedExpression() + "'.");
 			}
-			internalLoggingOfViolations += "\n- Violation cause: '" + violation.getCause() + "'.";
+			internalLoggingOfViolations
+					.append("\n- Violation cause: '" + violation.getCause() + "'.");
 			ContextWrapper wrapper = violation.getUsedContextData();
-			internalLoggingOfViolations += "\n- Violation context data: ";
+			internalLoggingOfViolations.append("\n- Violation context data: ");
 			if(wrapper == null) {
-				internalLoggingOfViolations += "'Not available'.";
+				internalLoggingOfViolations.append("'Not available'.");
 			} else {
 				EMap<String, EObject> contextElementsMap = wrapper.getContextElements();
 				for(Entry<String, EObject> entry : contextElementsMap.entrySet()) {
-					internalLoggingOfViolations += "\n\t* Identifier in rule: '" + entry.getKey() +
-							"', Object: '" + entry.getValue() + "'.";
+					internalLoggingOfViolations.append("\n\t* Identifier in rule: '" +
+							entry.getKey() + "', Object: '" + entry.getValue() + "'.");
 				}
 			}
+
+			// 2. Prepare violation for returning externally, i.e., hiding data based in clearance.
+			FeedbackLevel highestFeedbackLevel = clearanceManager
+					.getHighestClearedFeedbackLevel(userInfo, violation.getViolatedRule());
+			switch(highestFeedbackLevel) {
+				case INCONSISTENCY_WARNING:
+					// Only the general inconsistency warning should be shown, but nothing more
+					// specific, i.e., the rule, cause and context data should be hidden.
+					violation.setName("Hidden");
+					violation.setViolatedRule(null);
+				case RULE_WARNING:
+					// Everything up to and including the rule should be shown, but nothing more
+					// specific, i.e., the cause and context data should be hidden.
+					violation.setCause("Hidden");
+				case CAUSE_WARNING:
+					// Everything up to and including the cause should be shown, but nothing more
+					// specific, i.e., the context data should be hidden.
+					violation.setUsedContextData(null);
+					hiddenCounter++;
+					break;
+				default:
+					// If none of the restricted warnings above were triggered, it means that the
+					// full warning can be displayed and nothing needs to be hidden.
+			}
+
 		}
 
 		config.logInfo("Consistency feedback for consistency checking process '" + processUuid +
@@ -219,9 +226,9 @@ public class ConsistencyCheckingProcess {
 		config.logInternal(
 				"Filtering found violations for authorized feedback resulted in (partly) hiding " +
 						hiddenCounter + " violations.");
-		if(!internalLoggingOfViolations.isBlank()) {
+		if(internalLoggingOfViolations.length() > 0) {
 			config.logInternal("Internal logging of found violations:\n" +
-					internalLoggingOfViolations + "\n############");
+					internalLoggingOfViolations.toString() + "\n############");
 		}
 
 		int evaluatedRulesCounter = rulesToCheck.size();
@@ -252,13 +259,14 @@ public class ConsistencyCheckingProcess {
 		List<ConsistencyRule> allRules = config.getAllConsistencyRules();
 		config.logInfo("Loaded consistency rules: " + allRules.size());
 
-		HashMap<String, List<ConsistencyRule>> rulesBasedOnScopeClasses = new HashMap<>();
+		HashMap<Class<?>, List<ConsistencyRule>> rulesBasedOnScopeClasses = new HashMap<>();
 		for(ConsistencyRule rule : allRules) {
 			for(String classString : rule.getRuleScope()) {
-				if(rulesBasedOnScopeClasses.containsKey(classString)) {
-					rulesBasedOnScopeClasses.get(classString).add(rule);
+				Class<?> classInRule = getClassFromString(classString, metamodelPackages);
+				if(rulesBasedOnScopeClasses.containsKey(classInRule)) {
+					rulesBasedOnScopeClasses.get(classInRule).add(rule);
 				} else {
-					rulesBasedOnScopeClasses.put(classString,
+					rulesBasedOnScopeClasses.put(classInRule,
 							new ArrayList<ConsistencyRule>(Arrays.asList(rule)));
 				}
 			}
@@ -269,19 +277,17 @@ public class ConsistencyCheckingProcess {
 		ClearanceManager clearanceManager = config.getClearanceManager();
 		for(BasicElementInformation singleElementInfo : initialElementsToCheckInfo) {
 			String classString = singleElementInfo.getElementClassString();
-
 			Class<?> originalClass = getClassFromString(classString, metamodelPackages);
-			// The class itself will also be present in the following list:
-			List<Class<?>> superClasses = getAllSuperClassesOf(originalClass);
 
 			List<ConsistencyRule> relatedRules = new ArrayList<>();
-			for(Class<?> superClass : superClasses) {
-				List<ConsistencyRule> foundList =
-						rulesBasedOnScopeClasses.get(superClass.getCanonicalName());
-				if(foundList != null && !foundList.isEmpty()) {
-					relatedRules.addAll(foundList);
+			for(Class<?> existingClassInRules : rulesBasedOnScopeClasses.keySet()) {
+				List<ConsistencyRule> relatedRulesOfClass =
+						rulesBasedOnScopeClasses.get(existingClassInRules);
+				if(existingClassInRules.isAssignableFrom(originalClass)) {
+					relatedRules.addAll(relatedRulesOfClass);
 				}
 			}
+
 			if(!relatedRules.isEmpty()) {
 				for(ConsistencyRule relatedRule : relatedRules) {
 					boolean hasClearance =
@@ -319,10 +325,9 @@ public class ConsistencyCheckingProcess {
 		List<ConsistencyViolation> foundViolations = new ArrayList<>();
 
 		// Iterate through all rules to separately evaluate them.
-		for(Entry<ConsistencyRule, List<BasicElementInformation>> entry : rulesToCheckWithElements
-				.entrySet()) {
-			ConsistencyRule rule = entry.getKey();
-			List<BasicElementInformation> initialElementsToCheck = entry.getValue();
+		for(ConsistencyRule rule : rulesToCheckWithElements.keySet()) {
+			List<BasicElementInformation> initialElementsToCheck =
+					rulesToCheckWithElements.get(rule);
 
 			// 1. Set up the rule.
 			String violationName = "Violation of rule '" + rule.getName() + "'";
@@ -338,9 +343,13 @@ public class ConsistencyCheckingProcess {
 
 			// 2. Evaluate the rule for each starting point element.
 			for(BasicElementInformation initialElementToCheck : initialElementsToCheck) {
+				String elementDescription =
+						"on initial element [Name: '" + initialElementToCheck.getElementName() +
+								"', Class: '" + initialElementToCheck.getElementClassString() +
+								"', Model: '" + initialElementToCheck.getSourceModel() + "']";
 				config.logInfo("- Checking consistency rule ['" + rule.getName() +
-						"' - comment: '" + rule.getComment() + "'] on initial element '" +
-						initialElementToCheck.getElementName() + "' ...");
+						"' - comment: '" + rule.getComment() + "'] " + elementDescription + " ...");
+				violationName += " " + elementDescription;
 
 				// 2.1. Identify the needed data for this single evaluation.
 				List<BasicElementInformation> neededElementsInfo;
@@ -486,14 +495,7 @@ public class ConsistencyCheckingProcess {
 			String neededClassString = classFeature.getOwningClassString();
 			if(neededFeaturesPerNeededClass.containsKey(neededClassString)) {
 				List<ClassFeature> features = neededFeaturesPerNeededClass.get(neededClassString);
-				boolean featureAlreadyExists = false;
-				for(ClassFeature existingFeature : features) {
-					if(existingFeature.getFeatureName().equals(classFeature.getFeatureName())) {
-						featureAlreadyExists = true;
-						continue;
-					}
-				}
-				if(!featureAlreadyExists) {
+				if(!features.contains(classFeature)) {
 					features.add(classFeature);
 				}
 			} else {
@@ -549,8 +551,8 @@ public class ConsistencyCheckingProcess {
 			String adapterIdentifier = entry.getKey();
 			List<BasicElementInformation> neededElementsOfOneAdapter = entry.getValue();
 
-			ModelDataRequest requestBody = createModelDataRequest(EcoreUtil.copy(viewtype),
-					neededElementsOfOneAdapter, adapterIdentifier, EcoreUtil.copy(userInfo));
+			ModelDataRequest requestBody = createModelDataRequest(copy(viewtype),
+					neededElementsOfOneAdapter, adapterIdentifier, copy(userInfo));
 			dataRequests.add(requestBody);
 		}
 
@@ -560,7 +562,7 @@ public class ConsistencyCheckingProcess {
 		for(ModelDataRequest dataRequest : dataRequests) {
 			CompletableFuture<ModelDataFeedback> future = supplyAsync(() -> {
 				try {
-					DataRequester requester = new DataRequester(config);
+					DataRequester requester = new DataRequester();
 					return requester.requestDataFromAdapter(dataRequest);
 				} catch(Exception actualException) {
 					String ownExceptionMessage = "Could not request data from tool adapter '" +
@@ -584,8 +586,7 @@ public class ConsistencyCheckingProcess {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
 		List<ModelDataFeedback> combinedFutureResult;
 		try {
-			combinedFutureResult =
-					futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
+			combinedFutureResult = futures.stream().map(CompletableFuture::join).collect(toList());
 		} catch(CompletionException completionException) {
 			// Get the actual exception out of the CompletionException wrapper.
 			throw new FailedDataRequestException(completionException.getCause().getMessage());
@@ -594,13 +595,13 @@ public class ConsistencyCheckingProcess {
 		// 5. Merge all received views to one overall on which the evaluator can work.
 		ConsistencyView overallView = null;
 		for(ModelDataFeedback dataFeedback : combinedFutureResult) {
-			ConsistencyView receivedView = dataFeedback.getProvidedData();
-			if(receivedView == null) {
+			if(dataFeedback == null || dataFeedback.getProvidedData() == null) {
 				// If one single minimal data view is missing, there is not enough information to
 				// evaluate the current rule, which is why we can directly stop further computation.
 				throw new MissingDataException(
 						"The received minimal data view is null, what prevents this rule evaluation.");
 			}
+			ConsistencyView receivedView = dataFeedback.getProvidedData();
 			if(overallView == null) {
 				overallView = createConsistencyView(receivedView.getContent(), "Overall view");
 			} else {

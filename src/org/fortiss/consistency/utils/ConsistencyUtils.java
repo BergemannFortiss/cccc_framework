@@ -16,9 +16,10 @@
 package org.fortiss.consistency.utils;
 
 import static org.eclipse.emf.common.util.URI.createURI;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createContextWrapper;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.generateUniqueIdentifierBasedOnElemInfo;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createContextWrapper;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.generateUniqueIdentifierBasedOnElemInfo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -28,7 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
 
+import org.apache.catalina.webresources.TomcatURLStreamHandlerFactory;
 import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -49,6 +52,9 @@ import org.fortiss.consistency.model.ContextWrapper;
 import org.fortiss.consistency.model.RelationTargetInformation;
 import org.fortiss.consistency.model.RuleElement;
 import org.fortiss.consistency.model.views.ConsistencyView;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.xml.sax.InputSource;
@@ -88,7 +94,7 @@ public class ConsistencyUtils {
 	 * Returns the class of a model element based on the given information about the element. If it
 	 * cannot be found, an exception is thrown.
 	 * 
-	 * If the class might not be in the general class path but in an EPackage, this package (or
+	 * If the class might not be in the general classpath but in an EPackage, this package (or
 	 * rather a list of possible ones) can be provided as metamodels and the method will first
 	 * search within them for the class. If this should not be done (e.g., no EPackage exists), the
 	 * respective parameter should be null.
@@ -107,41 +113,9 @@ public class ConsistencyUtils {
 	}
 
 	/**
-	 * Returns the class based on its given name that should be used for/within a rule, which is why
-	 * the rule name will be used during logging when the class for the rule could not be found. If
-	 * it cannot be found, an exception is thrown.
-	 * 
-	 * If the class might not be in the general class path but in an EPackage, this package (or
-	 * rather a list of possible ones) can be provided as metamodels (by the configuration provider)
-	 * and the method will first search within them for the class. If this should not be done (e.g.,
-	 * no EPackage exists), the respective parameter should be null.
-	 * 
-	 * @param classString
-	 *            The name of the wanted class as string.
-	 * @param ruleName
-	 *            The name of the rule for which the class is wanted.
-	 * @param config
-	 *            The configuration provider containing information about the available metamodels
-	 *            in which the class should be searched.
-	 * @return The requested class.
-	 * 
-	 * @throws ClassNotFoundException
-	 */
-	public static Class<?> getClassForRuleFromString(String classString, String ruleName,
-			ConsistencyConfiguration config) throws ClassNotFoundException {
-		Class<?> foundClass = getClassFromString(classString, config.getAllAvailableMetamodels());
-		if(foundClass == null) {
-			config.logError("Rule '" + ruleName +
-					"' is ignored, because no class can be found for '" + classString +
-					"' in the current class path as well as in the given EPackage(s).");
-		}
-		return foundClass;
-	}
-
-	/**
 	 * Returns the class based on its given name. If it cannot be found, an exception is thrown.
 	 * 
-	 * If the class might not be in the general class path but in an EPackage, this package (or
+	 * If the class might not be in the general classpath but in an EPackage, this package (or
 	 * rather a list of possible ones) can be provided as metamodels and the method will first
 	 * search within them for the class. If this should not be done (e.g., no EPackage exists), the
 	 * respective parameter should be null.
@@ -162,20 +136,43 @@ public class ConsistencyUtils {
 				return classifier.getInstanceClass();
 			}
 		}
-		try {
-			return Class.forName(classString);
-		} catch(ClassNotFoundException e) {
-			// For some types, like primitives or collections, the detailed prefix is needed to be
-			// able to find them. Therefore, the search should be executed also with these refined
-			// class paths.
-			try {
-				// For primitives, like java.lang.Integer
-				return Class.forName("java.lang." + classString);
-			} catch(ClassNotFoundException e2) {
-				// For collections, like java.util.Set
-				return Class.forName("java.util." + classString);
+		// For some types, like primitives or collections, the detailed prefix is needed to be able
+		// to find them. Therefore, the search should be executed also with these refined class
+		// paths.
+		List<String> possibleClassNames = new ArrayList<>();
+		possibleClassNames.add(classString);
+		// For primitives, like java.lang.Integer.
+		possibleClassNames.add("java.lang." + classString);
+		// For collections, like java.util.Set.
+		possibleClassNames.add("java.util." + classString);
+		Class<?> foundClass = tryGetClassByNames(possibleClassNames);
+		if(foundClass == null) {
+			throw new ClassNotFoundException(
+					"A class with the following name could not be found: '" + classString + "'.");
+		}
+		return foundClass;
+	}
+
+	/**
+	 * Tries to find a class by going through the list of given class names. The first to be found
+	 * is returned. If none can be found at all, null is returned.
+	 * 
+	 * @param classNames
+	 *            The possible names of the wanted class.
+	 * @return The wanted class or null if it is not possible.
+	 */
+	private static Class<?> tryGetClassByNames(List<String> classNames) {
+		if(classNames != null && !classNames.isEmpty()) {
+			for(String className : classNames) {
+				try {
+					return Class.forName(className);
+				} catch(Exception ex) {
+					// Try next.
+					continue;
+				}
 			}
 		}
+		return null;
 	}
 
 	/**
@@ -289,29 +286,8 @@ public class ConsistencyUtils {
 	}
 
 	/**
-	 * Get the class (as {@link String}) of the rule element whose identifier is given together with
-	 * the owning rule. If it cannot be found, null is returned.
-	 * 
-	 * @param identifier
-	 *            The identifier of the rule element.
-	 * @param ruleOfIdentifier
-	 *            The rule in in which the element exists.
-	 * @return The name/string of the found class, otherwise null.
-	 */
-	public static String getClassStringOfElementIdentifier(String identifier,
-			ConsistencyRule ruleOfIdentifier) {
-		List<RuleElement> ruleElements = getAllRuleElementsOfRule(ruleOfIdentifier);
-		for(RuleElement ruleElement : ruleElements) {
-			if(ruleElement.getNameInRule().equals(identifier)) {
-				return ruleElement.getElementClassString();
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Creates (and returns) a context wrapper of the data from the given data view to have all the
-	 * needed data for the given rule elements. It will thrown an exception if data is missing for
+	 * needed data for the given rule elements. It will throw an exception if data is missing for
 	 * one of the needed rule elements.
 	 * 
 	 * @param dataView
@@ -450,8 +426,8 @@ public class ConsistencyUtils {
 	}
 
 	/**
-	 * Creates an encrypted response containing the given message (with a specific error identifier
-	 * at the beginning of the message).
+	 * Creates an encrypted response containing the given message (with a specific HTTP
+	 * status/response identifier at the beginning of the message).
 	 * 
 	 * @param message
 	 *            The message body that should be send as response.
@@ -473,7 +449,7 @@ public class ConsistencyUtils {
 			reponseBody = prepareFinalMessage(message, encrytionWanted, senderIdentifier,
 					targetIdentifier, config);
 			status = HttpStatus.OK;
-		} catch(FailedEncryptionException e) {
+		} catch(Exception e) {
 			config.logError(appendCausingException("Could not create full response message.", e));
 			reponseBody = config.encodeAsBytes("Encryption of response is not possible.");
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -501,10 +477,11 @@ public class ConsistencyUtils {
 	 * @return The prepared message.
 	 * 
 	 * @throws FailedEncryptionException
+	 * @throws IOException
 	 */
 	public static byte[] prepareFinalMessage(String messageBody, boolean encryptIfRequired,
 			String senderIdentifier, String targetIdentifier, ConsistencyConfiguration config)
-			throws FailedEncryptionException {
+			throws FailedEncryptionException, IOException {
 		byte[] payload;
 		if(encryptIfRequired && config.isDoubleEncryptionEnabled()) {
 			byte[] encryptedPayload =
@@ -517,8 +494,8 @@ public class ConsistencyUtils {
 	}
 
 	/**
-	 * Adds a prefix to the given payload to make sure that the receiver can know who was the
-	 * sender of the returned message.
+	 * Adds a prefix to the given payload to make sure that the receiver can know whether the
+	 * remaining message/payload is encrypted or not.
 	 * 
 	 * @param payload
 	 *            The payload of the message.
@@ -526,17 +503,17 @@ public class ConsistencyUtils {
 	 *            The configuration with all the background information (prefix, byte length, ...).
 	 * 
 	 * @return The final message with identifier prefix and message payload.
+	 * @throws IOException
 	 */
-	private static byte[] addEncryptedStatus(byte[] payload, ConsistencyConfiguration config) {
+	private static byte[] addEncryptedStatus(byte[] payload, ConsistencyConfiguration config)
+			throws IOException {
 		byte[] fixedPrefix = config.encodeAsBytes(config.getEncryptedStatusPrefix());
 
-		byte[] combinedArray = new byte[fixedPrefix.length + payload.length];
-		for(int i = 0; i < combinedArray.length; ++i) {
-			combinedArray[i] =
-					i < fixedPrefix.length ? fixedPrefix[i] : payload[i - fixedPrefix.length];
-		}
+		ByteArrayOutputStream arrayStream = new ByteArrayOutputStream();
+		arrayStream.write(fixedPrefix);
+		arrayStream.write(payload);
 
-		return combinedArray;
+		return arrayStream.toByteArray();
 	}
 
 	/**
@@ -551,9 +528,10 @@ public class ConsistencyUtils {
 	 *            The configuration with all the background information (prefix, byte length, ...).
 	 * 
 	 * @return The final message with identifier prefix and message payload.
+	 * @throws IOException
 	 */
 	private static byte[] addSenderIdentifier(byte[] payload, String identifier,
-			ConsistencyConfiguration config) {
+			ConsistencyConfiguration config) throws IOException {
 		// The first predefined bytes are for the prefix from which the first byte tells the
 		// length of the actual prefix string, i.e., the identifier must not be longer than the
 		// predefined bytes - 1.
@@ -562,13 +540,11 @@ public class ConsistencyUtils {
 		fixedPrefix[0] = (byte)identifier.length();
 		System.arraycopy(variablePrefix, 0, fixedPrefix, 1, variablePrefix.length);
 
-		byte[] combinedArray = new byte[fixedPrefix.length + payload.length];
-		for(int i = 0; i < combinedArray.length; ++i) {
-			combinedArray[i] =
-					i < fixedPrefix.length ? fixedPrefix[i] : payload[i - fixedPrefix.length];
-		}
+		ByteArrayOutputStream arrayStream = new ByteArrayOutputStream();
+		arrayStream.write(fixedPrefix);
+		arrayStream.write(payload);
 
-		return combinedArray;
+		return arrayStream.toByteArray();
 	}
 
 	/**
@@ -636,36 +612,79 @@ public class ConsistencyUtils {
 	}
 
 	/**
-	 * Returns all the super classes and super interfaces of the given class. The given class itself
-	 * will be included in the first position of the returned list.
+	 * Returns a property set in which the properties are set for a SpringBoot REST server that is
+	 * needed inside the consistency environment based on the given consistency configuration and
+	 * the essential interface information like address and port.
 	 * 
-	 * @param childClass
-	 *            The child of which the super classes and super interfaces are wanted.
-	 * 
-	 * @return All found super classes and super interfaces.
+	 * @param serverName
+	 *            The wanted name of the server.
+	 * @param serverAddress
+	 *            The wanted address of the server.
+	 * @param serverPort
+	 *            The wanted port of the server.
+	 * @param serverMaxThreads
+	 *            The wanted maximum number of threads of the server.
+	 * @param config
+	 *            The consistency configuration containing also SSL server information.
+	 * @return A property set that can be used to build and start the wanted server.
+	 * @throws IOException
 	 */
-	public static List<Class<?>> getAllSuperClassesOf(Class<?> childClass) {
-		List<Class<?>> allRelatedClasses = new ArrayList<>();
-		while(childClass != null) {
-			allRelatedClasses.add(childClass);
-			childClass = childClass.getSuperclass();
-		}
-		List<Class<?>> allRelatedClassesAndInterfaces = new ArrayList<>();
-		allRelatedClassesAndInterfaces.addAll(allRelatedClasses);
-		List<Class<?>> openClasses = allRelatedClasses;
-		while(!openClasses.isEmpty()) {
-			List<Class<?>> newAddedClasses = new ArrayList<>();
-			for(Class<?> currentClass : openClasses) {
-				Class<?>[] interfaces = currentClass.getInterfaces();
-				List<Class<?>> newInterfacesWithoutDuplicates =
-						new ArrayList<>(Arrays.asList(interfaces));
-				newInterfacesWithoutDuplicates.removeAll(allRelatedClassesAndInterfaces);
-				allRelatedClassesAndInterfaces.addAll(newInterfacesWithoutDuplicates);
-				newAddedClasses.addAll(newInterfacesWithoutDuplicates);
-			}
-			openClasses = newAddedClasses;
-		}
+	public static Properties setRestConsistencyServerProperties(String serverName,
+			String serverAddress, String serverPort, String serverMaxThreads,
+			ConsistencyConfiguration config) throws IOException {
+		// Usually, the following properties are set within an application.properties file.
+		// However, some properties I want to get from other configuration files, which is why I
+		// want to set them programmatically at runtime. The following way is one option to do
+		// this:
+		Properties serverProperties = new Properties();
+		serverProperties.setProperty("spring.application.name", serverName.replaceAll("\\s", ""));
+		// Possible logging levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF.
+		serverProperties.setProperty("logging.level.root", "ERROR");
+		serverProperties.setProperty("spring.main.banner-mode", "off");
 
-		return allRelatedClassesAndInterfaces;
+		serverProperties.setProperty("server.address", serverAddress);
+		serverProperties.setProperty("server.port", serverPort);
+		serverProperties.setProperty("server.servlet.context-path", "/");
+		serverProperties.setProperty("server.tomcat.threads.max", serverMaxThreads);
+
+		serverProperties.setProperty("server.ssl.enabled", "true");
+		serverProperties.setProperty("server.ssl.enabled-protocols", config.getSslProtocol());
+		serverProperties.setProperty("server.ssl.key-store-type", config.getSslKeyStoreType());
+		serverProperties.setProperty("server.ssl.key-store",
+				config.getKeyStoreFile().getCanonicalPath());
+		serverProperties.setProperty("server.ssl.key-store-password", config.getKeyStorePassword());
+		serverProperties.setProperty("server.ssl.client-auth", "need");
+		serverProperties.setProperty("server.ssl.trust-store-type", config.getSslKeyStoreType());
+		serverProperties.setProperty("server.ssl.trust-store",
+				config.getTrustStoreFile().getCanonicalPath());
+		serverProperties.setProperty("server.ssl.trust-store-password",
+				config.getTrustStorePassword());
+		return serverProperties;
+	}
+
+	/**
+	 * Builds and starts a SpringBoot REST server for the consistency environment based on the given
+	 * set of server properties and the class of the actual server. The application context of the
+	 * started server is returned.
+	 * 
+	 * @param serverClass
+	 *            The class of the implemented server.
+	 * @param serverProperties
+	 *            The properties with which the server should be built and started.
+	 * @return The application context of the started server.
+	 */
+	public static ConfigurableApplicationContext
+			buildAndStartRestConsistencyServer(Class<?> serverClass, Properties serverProperties) {
+		// It seems that other instances set the URLStreamHandlerFactory already before, which
+		// is why Tomcat fails to do this itself and therefore prevents the whole server setup.
+		// A possible workaround is to disable the factory set through Tomcat:
+		// Source: https://github.com/spring-projects/spring-boot/issues/21535
+		TomcatURLStreamHandlerFactory.disable();
+
+		SpringApplicationBuilder builder = new SpringApplicationBuilder(serverClass);
+		SpringApplication serverApplication = builder.properties(serverProperties).build();
+		// No additional arguments need to be given.
+		String[] args = new String[0];
+		return serverApplication.run(args);
 	}
 }

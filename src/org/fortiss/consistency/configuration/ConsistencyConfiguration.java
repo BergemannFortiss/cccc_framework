@@ -45,9 +45,10 @@ import org.fortiss.consistency.security.encryption.TinkEncryptionManager;
  * This class contains/provides all important configuration details/information to the CCCC, like
  * the keys, rules, links, etc. (most of them are read from external resource files).
  * 
- * Future Work: This should be an own program/service that manages all of this setup/configuration
- * of the base consistency information and have an own API with which consistency manager can adjust
- * such information, e.g., register new users or add new consistency rules.
+ * Future Work (#4416): This should be an own program/service that manages all of this
+ * setup/configuration of the base consistency information and have an own API with which
+ * consistency manager can adjust such information, e.g., register new users or add new consistency
+ * rules.
  * 
  * @author bergemann
  */
@@ -76,8 +77,6 @@ public class ConsistencyConfiguration {
 	private ClearanceManager clearancenManager;
 	/** The currently used logger. */
 	private Logger consistencyLogger;
-	/** The currently used logger level. */
-	private Level generalLoggerLevel;
 	/** The currently used path of the log file. */
 	private String logFilePath;
 
@@ -105,6 +104,15 @@ public class ConsistencyConfiguration {
 	/** Registers all important elements for the consistency process. */
 	public void registerAllElements() {
 		loader.registerAllImportantElementsFromFile();
+	}
+
+	/**
+	 * Registers the available metamodels for the consistency process. This is already executed
+	 * during {@link #registerAllElements()}, and is therefore not needed anymore if the
+	 * registration of all elements was already called.
+	 */
+	public void registerAvailableMetaModels() {
+		loader.registerMainMetamodels();
 	}
 
 	/**
@@ -433,41 +441,12 @@ public class ConsistencyConfiguration {
 	 * Returns an evaluator instance of the evaluator type that should be used for the whole
 	 * consistency process.
 	 * 
-	 * @return A full/deep evaluator instance.
-	 */
-	public IRuleEvaluator getNewDeepEvaluatorInstance() {
-		boolean shallowInstance = false;
-		return getNewEvaluatorInstance(shallowInstance);
-	}
-
-	/**
-	 * Returns a shallow evaluator instance on which the initial setup method can be executed,
-	 * but nothing else.
-	 * 
-	 * @return A shallow evaluator instance.
-	 */
-	public IRuleEvaluator getNewShallowEvaluatorInstance() {
-		boolean shallowInstance = true;
-		return getNewEvaluatorInstance(shallowInstance);
-	}
-
-	/**
-	 * Returns an evaluator instance of the evaluator type that should be used for the whole
-	 * consistency process. If another evaluator type should be used, please change this (only)
-	 * here. If only a shallow evaluator instance is needed, the dummy parameter needs to be set to
-	 * true. Then, only an instance is returned on which the initial setup method can be executed,
-	 * but nothing else.
-	 * 
-	 * @param isDummy
-	 *            True if only a shallow evaluator instance should be provided, otherwise false.
+	 * Attention: If another evaluator type should be used, please change this ONLY here!
 	 * 
 	 * @return An evaluator instance.
 	 */
-	private IRuleEvaluator getNewEvaluatorInstance(boolean isDummy) {
-		if(isDummy) {
-			return new OclEvaluator();
-		}
-		return new OclEvaluator(this);
+	public IRuleEvaluator getNewEvaluatorInstance() {
+		return new OclEvaluator();
 	}
 
 	/**
@@ -514,25 +493,6 @@ public class ConsistencyConfiguration {
 	}
 
 	/**
-	 * Returns the general consistency logger level.
-	 * 
-	 * @return The level.
-	 */
-	public Level getGeneralLoggerLevel() {
-		return generalLoggerLevel;
-	}
-
-	/**
-	 * Sets the general consistency logger level.
-	 * 
-	 * @param level
-	 *            The new level.
-	 */
-	public void setGeneralLoggerLevel(Level level) {
-		this.generalLoggerLevel = level;
-	}
-
-	/**
 	 * Sets up the consistency logger (even if one exists already). If one was set up already
 	 * before, the same log file will be used and the new logs will be appended to the previous
 	 * ones.
@@ -542,8 +502,8 @@ public class ConsistencyConfiguration {
 	 */
 	public String setupConsistencyLogger() throws Exception {
 		Logger logger = Logger.getLogger("ConsistencyLogger");
-		setGeneralLoggerLevel(ALL);
-		logger.setLevel(getGeneralLoggerLevel());
+		Level generalLoggerLevel = ALL;
+		logger.setLevel(generalLoggerLevel);
 
 		if(logFilePath == null || logFilePath.isBlank()) {
 			String dirPath = getAbsoluteLogDirectoyPath();
@@ -562,7 +522,7 @@ public class ConsistencyConfiguration {
 		FileHandler loggingFileHandler = new FileHandler(logFilePath, appendMode);
 		SimpleFormatter formatter = new SimpleFormatter();
 		loggingFileHandler.setFormatter(formatter);
-		loggingFileHandler.setLevel(getGeneralLoggerLevel());
+		loggingFileHandler.setLevel(generalLoggerLevel);
 
 		logger.addHandler(loggingFileHandler);
 		logger.setUseParentHandlers(false);
@@ -665,8 +625,8 @@ public class ConsistencyConfiguration {
 	}
 
 	/**
-	 * Returns a byte array of the given string with the right encoding, but without any
-	 * encryption.
+	 * Returns a byte array of the given string with the right encoding (based on the current
+	 * config, where the encoding could be changed), but without any encryption.
 	 * 
 	 * @param plaintext
 	 *            The plaintext as string that is wanted as byte array.
@@ -678,8 +638,8 @@ public class ConsistencyConfiguration {
 	}
 
 	/**
-	 * Returns a string of the given byte array with the right encoding, but without any
-	 * decryption.
+	 * Returns a string of the given byte array with the right encoding (based on the current
+	 * config, where the encoding could be changed), but without any decryption.
 	 * 
 	 * @param plaintext
 	 *            The plaintext as byte array that is wanted as string.
@@ -700,7 +660,7 @@ public class ConsistencyConfiguration {
 		if(consistencyLogger != null) {
 			consistencyLogger.severe(message);
 		}
-		System.err.println(getConsistencyCheckerPrefix() + " " + message);
+		System.err.println(getConsistencyCheckerPrefix() + " ERROR: " + message);
 	}
 
 	/**
@@ -713,7 +673,7 @@ public class ConsistencyConfiguration {
 		if(consistencyLogger != null) {
 			consistencyLogger.warning(message);
 		}
-		System.out.println(getConsistencyCheckerPrefix() + " WARNING: " + message);
+		System.err.println(getConsistencyCheckerPrefix() + " WARNING: " + message);
 	}
 
 	/**

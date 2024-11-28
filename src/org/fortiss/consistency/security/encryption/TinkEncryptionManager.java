@@ -55,6 +55,10 @@ public class TinkEncryptionManager implements IEncryptionManager {
 	/**
 	 * Constructor.
 	 * 
+	 * Since this class might be used by different actors (not only the C4, but also by some
+	 * adapters), it is important to not use the general static configuration from the C4, but be
+	 * parameterizable regarding the correct config!
+	 * 
 	 * @param config
 	 *            The configuration with all the information needed for this class.
 	 */

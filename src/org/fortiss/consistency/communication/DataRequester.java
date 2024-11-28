@@ -21,6 +21,7 @@ import static org.fortiss.consistency.utils.ConsistencyUtils.getPayloadFromMessa
 import static org.fortiss.consistency.utils.ConsistencyUtils.isMessageEncrypted;
 import static org.fortiss.consistency.utils.ConsistencyUtils.prepareFinalMessage;
 import static org.fortiss.consistency.utils.ConsistencyUtils.serializeConsistencyElement;
+import static org.springframework.http.HttpStatus.OK;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +40,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource.Factory;
+import org.fortiss.consistency.CentralConsistencyEnvironment;
 import org.fortiss.consistency.configuration.ConsistencyConfiguration;
 import org.fortiss.consistency.exceptions.EmptyResponseException;
 import org.fortiss.consistency.exceptions.FailedCommunicationException;
@@ -52,7 +54,6 @@ import org.fortiss.consistency.model.communication.ModelDataFeedback;
 import org.fortiss.consistency.model.communication.ModelDataRequest;
 import org.fortiss.consistency.model.communication.ToolAdapterRegistrationEntry;
 import org.fortiss.consistency.model.communication.util.CommunicationResourceFactoryImpl;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -73,14 +74,9 @@ public class DataRequester {
 	/** A shared rest template used to perform all HTTP(S) requests. */
 	private RestTemplate restTemplate;
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param config
-	 *            The configuration with all the information needed for this class.
-	 */
-	public DataRequester(ConsistencyConfiguration config) {
-		this.config = config;
+	/** Constructor. */
+	public DataRequester() {
+		this.config = CentralConsistencyEnvironment.getInstance().getConfiguration();
 		instantiateSSLContext();
 
 		if(sslContext == null) {
@@ -135,7 +131,7 @@ public class DataRequester {
 		// 2. Encrypt the request message (and other preparations).
 		// Although the request and especially the response (data exchange) is done via a
 		// TLSv1.3 socket connection with two-way authentication and end-to-end encryption to
-		// protect sensible data, it is safer to also encrypt it in addition.
+		// protect sensible data, it is safer to also encrypt its internal payload in addition.
 		byte[] encryptedRequestBody;
 		try {
 			boolean encrytionWanted = true;
@@ -143,7 +139,7 @@ public class DataRequester {
 			String targetIdentifier = adapterIdentifier;
 			encryptedRequestBody = prepareFinalMessage(serializedRequestBody, encrytionWanted,
 					senderIdentifier, targetIdentifier, config);
-		} catch(FailedEncryptionException e) {
+		} catch(Exception e) {
 			String ownExceptionMessage =
 					"Failed encryption of body for request '" + requestBody.getRequestIdentifier() +
 							"' to '" + requestBody.getTargetedAdapter() + "'.";
@@ -161,7 +157,7 @@ public class DataRequester {
 		}
 
 		// 4. Process the response.
-		if(!receivedResponse.getStatusCode().equals(HttpStatus.OK)) {
+		if(!receivedResponse.getStatusCode().equals(OK)) {
 			config.logError(adapterIdentifier +
 					" adapter data server responded with an unexpected HTTP status. Cannot continue consistency check. Received HTTP status: '" +
 					receivedResponse.getStatusCode().toString() + "'.");
@@ -209,7 +205,7 @@ public class DataRequester {
 					appendCausingException(ownExceptionMessage, e));
 		}
 
-		// 4.3. Transform it into the correct return object.
+		// 4.3. Cast it into the correct return object.
 		if(!(deserializedObject instanceof ModelDataFeedback)) {
 			String ownExceptionMessage = "Received data from adapter '" + adapterIdentifier +
 					"' is not a ModelDataFeedback. Cannot deal here with '" +
@@ -222,20 +218,23 @@ public class DataRequester {
 	/**
 	 * Requests data from a consistency adapter by sending the given request message to the data
 	 * server of the given adapter identifier. It then waits for the response, which is returned
-	 * as response entity whose body contains the provided data as encrypted serialized byte array
-	 * (no pre-processing done yet!).
+	 * as response entity whose body contains the provided data as encrypted serialized byte array.
 	 * 
 	 * @param requestMessage
 	 *            The message body that should be sent.
 	 * @param adapterIdentifier
 	 *            The identifier of the adapter to which the message should be sent.
-	 * @return The response (or null if it was not possible).
+	 * @return The response.
+	 * @throws Exception
 	 */
-	private ResponseEntity<byte[]> sendRequest(byte[] requestMessage, String adapterIdentifier) {
+	private ResponseEntity<byte[]> sendRequest(byte[] requestMessage, String adapterIdentifier)
+			throws Exception {
 		ToolAdapterRegistrationEntry adapterInfo = config.getRegistrationEntryOf(adapterIdentifier);
 		URI uri = createUriFor(config.getDataRequestEndpoint(), adapterInfo);
 		if(uri == null) {
-			return null;
+			throw new Exception(
+					"URI could not be created for '" + adapterInfo.getAdapterIdentifier() +
+							"' with endpoint '" + config.getDataRequestEndpoint() + "'.");
 		}
 
 		try {
@@ -243,7 +242,7 @@ public class DataRequester {
 		} catch(Exception e) {
 			config.logError("Could not request model data from " + adapterIdentifier +
 					". Exception message: " + e.getMessage());
-			return null;
+			throw e;
 		}
 	}
 

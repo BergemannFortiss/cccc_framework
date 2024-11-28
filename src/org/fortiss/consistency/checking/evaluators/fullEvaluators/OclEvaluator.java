@@ -15,8 +15,8 @@
 +--------------------------------------------------------------------------*/
 package org.fortiss.consistency.checking.evaluators.fullEvaluators;
 
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createClassFeatureBasedOnName;
-import static org.fortiss.consistency.utils.ConsistencyModelElementFactory.createContextWrapperDummy;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createClassFeatureBasedOnName;
+import static org.fortiss.consistency.model.ConsistencyModelElementFactory.createContextWrapperDummy;
 import static org.fortiss.consistency.utils.ConsistencyUtils.getAllRuleElementsOfRule;
 import static org.fortiss.consistency.utils.ConsistencyUtils.getClassFromString;
 
@@ -34,6 +34,7 @@ import org.eclipse.ocl.pivot.Type;
 import org.eclipse.ocl.pivot.utilities.MetamodelManager;
 import org.eclipse.ocl.pivot.utilities.OCL;
 import org.eclipse.ocl.xtext.essentialocl.EssentialOCLStandaloneSetup;
+import org.fortiss.consistency.CentralConsistencyEnvironment;
 import org.fortiss.consistency.checking.evaluators.BaseRuleEvaluator;
 import org.fortiss.consistency.configuration.ConsistencyConfiguration;
 import org.fortiss.consistency.exceptions.EvaluatorException;
@@ -68,14 +69,16 @@ public class OclEvaluator extends BaseRuleEvaluator {
 	private ExpressionInOCL oclExpression;
 
 	/**
-	 * Constructor.
-	 * 
-	 * @param config
-	 *            The configuration with all the information needed for this class,
-	 *            especially the available metamodels.
+	 * All metamodels from which classes, attributes, etc. might be used inside the consistency
+	 * rules.
 	 */
-	public OclEvaluator(ConsistencyConfiguration config) {
-		super(config);
+	private List<EPackage> availableMetamodels;
+
+	/** Constructor. */
+	public OclEvaluator() {
+		ConsistencyConfiguration config =
+				CentralConsistencyEnvironment.getInstance().getConfiguration();
+		availableMetamodels = config.getAllAvailableMetamodels();
 
 		EPackage.Registry packageRegistry = new EPackageRegistryImpl();
 		for(EPackage metamodelPackage : availableMetamodels) {
@@ -85,7 +88,7 @@ public class OclEvaluator extends BaseRuleEvaluator {
 		// It is also possible to create an OCL instance by replacing "packageRegistry" with
 		// "org.eclipse.ocl.pivot.resource.ProjectManager.CLASS_PATH". In this case, OCL would
 		// register everything itself by taking all found metamodels/types/classes from the official
-		// class path. However, as long as the creation with the own registry works, it is faster to
+		// classpath. However, as long as the creation with the own registry works, it is faster to
 		// use this reduced instantiation.
 		oclInstance = OCL.newInstance(packageRegistry);
 		oclExpression = null;
@@ -105,16 +108,6 @@ public class OclEvaluator extends BaseRuleEvaluator {
 						"\nOriginal error message:\n" + e.getMessage());
 			}
 		}
-	}
-
-	/**
-	 * This is a dummy constructor that does not need anything but also does not set up or do
-	 * anything. It should only be used to get quickly a dummy OCL evaluator instance to perform the
-	 * setup task.
-	 */
-	public OclEvaluator() {
-		super(null);
-		oclInstance = null;
 	}
 
 	/** {@inheritDoc} */
@@ -139,7 +132,7 @@ public class OclEvaluator extends BaseRuleEvaluator {
 	@Override
 	public void setRuleExpression(ConsistencyRule rule) throws EvaluatorException {
 		RuleCondition condition = rule.getRuleCondition();
-		String modifiedRuleExpression = condition.getOriginalExpression();
+		String currentRuleExpression = condition.getOriginalExpression();
 		List<RuleElement> ruleElements = getAllRuleElementsOfRule(rule);
 		for(RuleElement ruleElement : ruleElements) {
 			String identifier = ruleElement.getNameInRule();
@@ -151,14 +144,14 @@ public class OclEvaluator extends BaseRuleEvaluator {
 						"--> This class could not be found: " +
 								ruleElement.getElementClassString());
 			}
-			modifiedRuleExpression = getRuleExpressionWithCorrectIdentifierAndTypes(
-					modifiedRuleExpression, identifier, elementClass);
+			currentRuleExpression = getRuleExpressionWithCorrectIdentifierAndTypes(
+					currentRuleExpression, identifier, elementClass);
 		}
-		condition.setModifiedExpression(modifiedRuleExpression);
+		condition.setModifiedExpression(currentRuleExpression);
 		currentRule = rule;
 		ContextWrapper context = createContextWrapperDummy();
 		try {
-			oclExpression = oclInstance.createInvariant(context.eClass(), modifiedRuleExpression);
+			oclExpression = oclInstance.createInvariant(context.eClass(), currentRuleExpression);
 		} catch(Exception e) {
 			throw createStandardEvaluatorException("the creation of a (parsed) rule expression",
 					"--> Original OCL exception:\n" + e.getClass().getName() + ": " +
@@ -211,8 +204,6 @@ public class OclEvaluator extends BaseRuleEvaluator {
 		}
 
 		List<ClassFeature> classFeatures = new ArrayList<>();
-
-		oclExpression.allOwnedElements();
 		for(Element element : oclExpression.allOwnedElements()) {
 			if(element instanceof PropertyCallExp &&
 					((PropertyCallExp)element).getName() != "contextElements") {
@@ -223,20 +214,35 @@ public class OclEvaluator extends BaseRuleEvaluator {
 				String owningTypeFullName = getFullTypeName(owningType);
 
 				ClassFeature classFeature = createClassFeatureBasedOnName(featureName,
-						owningTypeFullName, super.availableMetamodels);
-				boolean classFeatureAlreadyExists = false;
-				for(ClassFeature existentClassFeature : classFeatures) {
-					if(areSameClassFeatures(existentClassFeature, classFeature)) {
-						classFeatureAlreadyExists = true;
-					}
-				}
-				if(!classFeatureAlreadyExists) {
+						owningTypeFullName, availableMetamodels);
+				if(!classFeatureExistsInFeatureList(classFeature, classFeatures)) {
 					classFeatures.add(classFeature);
 				}
 			}
 		}
 
 		return classFeatures;
+	}
+
+	/**
+	 * Checks if the given class feature exists already in the given class feature list and returns
+	 * then the result.
+	 * 
+	 * @param newClassFeature
+	 *            The class feature which should be searched in the list.
+	 * @param existingClassFeatures
+	 *            The list in which the class feature should be searched.
+	 * 
+	 * @return True if given class feature exists in given class feature list, otherwise false.
+	 */
+	private boolean classFeatureExistsInFeatureList(ClassFeature newClassFeature,
+			List<ClassFeature> existingClassFeatures) {
+		for(ClassFeature existingClassFeature : existingClassFeatures) {
+			if(areSameClassFeatures(existingClassFeature, newClassFeature)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -301,6 +307,6 @@ public class OclEvaluator extends BaseRuleEvaluator {
 		if(oclClassName.equals("Real")) {
 			oclClassName = "Double";
 		}
-		return getClassFromString(oclClassName, super.availableMetamodels);
+		return getClassFromString(oclClassName, availableMetamodels);
 	}
 }
